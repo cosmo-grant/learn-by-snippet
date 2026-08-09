@@ -2,7 +2,7 @@
 
 format:
 	uv tool run ruff format .
-	npx prettier --write .
+	prettier --write .
 
 questions:
 	uv run ./make_questions.py
