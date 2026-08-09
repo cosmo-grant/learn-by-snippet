@@ -88,8 +88,6 @@ def main() -> None:
         Path(question_dir / "output.txt").write_text(output)
         Path(question_dir / "explanation.html").write_text(explanation)
         Path(question_dir / "preface.html").touch()
-        Path(question_dir / "wrong_0.txt").touch()
-        Path(question_dir / "wrong_1.txt").touch()
 
 
 if __name__ == "__main__":

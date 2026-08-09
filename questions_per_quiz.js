@@ -1,9 +1,738 @@
 // Generated automatically. Do not edit.
 
 const QUESTIONS_PER_QUIZ = {
-  
+  concurrency: [
+    {
+      preface: `<p>What does this output?</p>
+`,
+      code: `from time import sleep
+
+sleep(3)
+print("done")
+sleep(3)
+print("done")
+print("here")
+`,
+      output: `<~3s>
+done
+<~3s>
+done
+here
+`,
+      explanation: `<p>One process, one thread, no event loop.</p>
+
+<p>Simple. Slow.</p>
+`,
+    },
+
+    {
+      preface: `<p>Let's move the work into threads. Output?</p>
+`,
+      code: `from threading import Thread
+from time import sleep
+
+
+def io_bound():
+    sleep(3)
+    print("done")
+
+
+thread1 = Thread(target=io_bound)
+thread2 = Thread(target=io_bound)
+thread1.start()
+thread2.start()
+print("here")
+`,
+      output: `here
+<~3s>
+done
+done
+`,
+      explanation: `<p>A thread runs only when it holds the Global Interpreter Lock.</p>
+
+<p>
+  The running thread is paused regularly, or when it makes a syscall, and a
+  ready thread gets the GIL and runs. Interleaved, not parallel.
+</p>
+
+<p>
+  So: when <code>thread1</code> and <code>thread2</code> sleep, the main thread
+  runs.
+</p>
+`,
+    },
+
+    {
+      preface: `<p>What if we <code>join()</code> them?</p>
+`,
+      code: `from threading import Thread
+from time import sleep
+
+
+def io_bound():
+    sleep(3)
+    print("done")
+
+
+thread1 = Thread(target=io_bound)
+thread2 = Thread(target=io_bound)
+thread1.start()
+thread1.join()
+thread2.start()
+thread2.join()
+print("here")
+`,
+      output: `<~3s>
+done
+<~3s>
+done
+here
+`,
+      explanation: `<p><code>join()</code> blocks until the receiver completes.</p>
+`,
+    },
+
+    {
+      preface: `<p>Does re-ordering make a difference?</p>
+`,
+      code: `from threading import Thread
+from time import sleep
+
+
+def io_bound():
+    sleep(3)
+    print("done")
+
+
+thread1 = Thread(target=io_bound)
+thread2 = Thread(target=io_bound)
+thread1.start()
+thread2.start()
+thread1.join()
+thread2.join()
+print("here")
+`,
+      output: `<~3s>
+done
+done
+here
+`,
+      explanation: `<p>
+  <code>thread1.join()</code> blocks the main thread, but not
+  <code>thread2</code>.
+</p>
+
+<p>
+  <code>thread1</code> and <code>thread2</code> are io-bound, so interleaving
+  helps.
+</p>
+`,
+    },
+
+    {
+      preface: `<p>How about cpu-bound threads?</p>
+`,
+      code: `from threading import Thread
+
+
+def cpu_bound():
+    # assume the sum takes 3s of cpu
+    sum(i**2 for i in range(2**25))
+    print("done")
+
+
+thread1 = Thread(target=cpu_bound)
+thread2 = Thread(target=cpu_bound)
+thread1.start()
+thread2.start()
+print("here")
+`,
+      output: `here
+<~6s>
+done
+done
+`,
+      explanation: `<p>
+  The main thread runs when <code>thread1</code> and <code>thread2</code> are
+  paused.
+</p>
+
+<p>
+  <code>thread1</code> and <code>thread2</code> are cpu-bound, so interleaving
+  doesn't help.
+</p>
+`,
+    },
+
+    {
+      preface: `<p>Ok, let's <code>join()</code> again.</p>
+`,
+      code: `from threading import Thread
+
+
+def cpu_bound():
+    # assume the sum takes 3s of cpu
+    sum(i**2 for i in range(2**25))
+    print("done")
+
+
+thread1 = Thread(target=cpu_bound)
+thread2 = Thread(target=cpu_bound)
+thread1.start()
+thread1.join()
+thread2.start()
+thread2.join()
+print("here")
+`,
+      output: `<~3s>
+done
+<~3s>
+done
+here
+`,
+      explanation: `<p>Same as before: <code>join()</code> blocks until the receiver completes.</p>
+`,
+    },
+
+    {
+      preface: `<p>Does re-ordering make a difference?</p>
+`,
+      code: `from threading import Thread
+
+
+def cpu_bound():
+    # assume the sum takes 3s of cpu
+    sum(i**2 for i in range(2**25))
+    print("done")
+
+
+thread1 = Thread(target=cpu_bound)
+thread2 = Thread(target=cpu_bound)
+thread1.start()
+thread2.start()
+thread1.join()
+thread2.join()
+print("here")
+`,
+      output: `<~6s>
+done
+done
+here
+`,
+      explanation: `<p>
+  <code>thread1.join()</code> blocks the main thread, not <code>thread2</code>.
+</p>
+
+<p>But they're still cpu-bound so the total time is unchanged.</p>
+`,
+    },
+
+    {
+      preface: `<p>Same as the previous question, no?</p>
+`,
+      code: `from threading import Thread
+
+
+def cpu_bound():
+    # assume the sum takes 3s of cpu
+    sum(range(2**25))
+    print("done")
+
+
+thread1 = Thread(target=cpu_bound)
+thread2 = Thread(target=cpu_bound)
+thread1.start()
+thread2.start()
+thread1.join()
+thread2.join()
+print("here")
+`,
+      output: `<~3s>
+done
+<~3s>
+done
+here
+`,
+      explanation: `<p>
+  The interpreter doesn't pause a thread while it's running native code, like
+  <code>sum()</code> does.
+</p>
+`,
+    },
+
+    {
+      preface: `<p>What if threads go bad?</p>
+`,
+      code: `from threading import Thread
+
+
+def bad():
+    raise Exception
+
+
+thread = Thread(target=bad)
+thread.start()
+thread.join()
+print("here")
+`,
+      output: `Exception in thread Thread-1 (bad):
+Traceback (most recent call last):
+  ...
+Exception
+here
+`,
+      explanation: `<p>
+  <code>threading.excepthook()</code> prints on stderr an exception raised by
+  <code>Thread.run()</code>.
+</p>
+
+<p>
+  But the exception doesn't propagate to the main thread, so
+  <code>here</code> is still printed and the exit code is 0.
+</p>
+`,
+    },
+
+    {
+      preface: `<p>Let's swap threads for processes.</p>
+`,
+      code: `from multiprocessing import Process
+from time import sleep
+
+
+def io_bound():
+    sleep(3)
+    print("done")
+
+
+if __name__ == "__main__":
+    # running on multicore machine
+    proc1 = Process(target=io_bound)
+    proc2 = Process(target=io_bound)
+    proc1.start()
+    proc2.start()
+    print("here")
+`,
+      output: `here
+<~3s>
+done
+done
+`,
+      explanation: `<p>Process objects run in separate processes, each with their own GIL.</p>
+
+<p>So they <em>can</em> run in parallel.</p>
+
+<p>But for io-bound work threads might be the better choice.</p>
+`,
+    },
+
+    {
+      preface: `<p>What about cpu-bound work?</p>
+`,
+      code: `from multiprocessing import Process
+
+
+def cpu_bound():
+    # assume the sum takes 3s of cpu
+    sum(i**2 for i in range(2**25))
+    print("done")
+
+
+if __name__ == "__main__":
+    # running on multicore machine
+    proc1 = Process(target=cpu_bound)
+    proc2 = Process(target=cpu_bound)
+    proc1.start()
+    proc2.start()
+    proc1.join()
+    proc2.join()
+    print("here")
+`,
+      output: `<~3s>
+done
+done
+here
+`,
+      explanation: `<p>
+  <code>thread1</code> and <code>thread2</code> are cpu-bound, so running in
+  parallel helps.
+</p>
+`,
+    },
+
+    {
+      preface: `<p>What if processes go bad?</p>
+`,
+      code: `from multiprocessing import Process
+
+
+def bad():
+    raise Exception
+
+
+if __name__ == "__main__":
+    proc = Process(target=bad)
+    proc.start()
+    proc.join()
+    print("here")
+`,
+      output: `Process Process-1:
+Traceback (most recent call last):
+  ...
+Exception
+here
+`,
+      explanation: `<p>
+  Same story as for threads: the exception is printed on stderr but doesn't
+  propagate to the main process.
+</p>
+`,
+    },
+
+    {
+      preface: `<p>A third approach: <code>asyncio</code>.</p>
+`,
+      code: `import asyncio
+from time import sleep
+
+
+async def io_bound():
+    sleep(3)
+    print("done")
+
+
+async def main():
+    io_bound()
+    io_bound()
+    print("here")
+
+
+asyncio.run(main())
+`,
+      output: `here
+`,
+      explanation: `<p>
+  A function defined with <code>async def</code> is a coroutine function and
+  returns a coroutine.
+</p>
+
+<p>Just creating a coroutine doens't schedule it on the event loop.</p>
+`,
+    },
+
+    {
+      preface: `<p>Ok, so let's <code>await</code>.</p>
+`,
+      code: `import asyncio
+from time import sleep
+
+
+async def io_bound():
+    sleep(3)
+    print("done")
+
+
+async def main():
+    await io_bound()
+    await io_bound()
+    print("here")
+
+
+asyncio.run(main())
+`,
+      output: `<~3s>
+done
+<~3s>
+done
+here
+`,
+      explanation: `<p>Awaiting a coroutine blocks until it completes.</p>
+
+<p>No speedup yet.</p>
+`,
+    },
+
+    {
+      preface: `<p>We need async-aware functions, like <code>asyncio.sleep()</code>, right?</p>
+`,
+      code: `import asyncio
+
+
+async def io_bound():
+    await asyncio.sleep(3)
+    print("here")
+
+
+async def main():
+    await io_bound()
+    await io_bound()
+    print("done")
+
+
+asyncio.run(main())
+`,
+      output: `<~3s>
+here
+<~3s>
+here
+done
+`,
+      explanation: `<p>
+  <code>await asyncio.sleep()</code> does pass control to the event loop, but
+  there's no other work scheduled at that point.
+</p>
+`,
+    },
+
+    {
+      preface: `<p>What if we <code>gather()</code> them instead?</p>
+`,
+      code: `import asyncio
+from time import sleep
+
+
+async def io_bound():
+    sleep(3)
+    print("done")
+
+
+async def main():
+    await asyncio.gather(io_bound(), io_bound())
+    print("here")
+
+
+asyncio.run(main())
+`,
+      output: `<~3s>
+done
+<~3s>
+done
+here
+`,
+      explanation: `<p><code>gather()</code> runs the awaitables concurrently.</p>
+
+<p>
+  But still no speedup, because <code>sleep()</code> blocks the one and only
+  thread.
+</p>
+`,
+    },
+
+    {
+      preface: `<p>
+  What if we <code>gather()</code> <em>and</em> <code>asyncio.sleep()</code>?
+</p>
+`,
+      code: `import asyncio
+
+
+async def io_bound():
+    await asyncio.sleep(3)
+    print("done")
+
+
+async def main():
+    await asyncio.gather(io_bound(), io_bound())
+    print("here")
+
+
+asyncio.run(main())
+`,
+      output: `<~3s>
+done
+done
+here
+`,
+      explanation: `<p>Speedup at last!</p>
+`,
+    },
+
+    {
+      preface: `<p>Remember threads?</p>
+`,
+      code: `import asyncio
+from time import sleep
+
+
+def io_bound():
+    sleep(3)
+    print("done")
+
+
+async def main():
+    await asyncio.gather(
+        asyncio.to_thread(io_bound),
+        asyncio.to_thread(io_bound),
+    )
+    print("here")
+
+
+asyncio.run(main())
+`,
+      output: `<~3s>
+done
+done
+here
+`,
+      explanation: `<p>
+  <code>asyncio.to_thread()</code> is useful for async-unaware io-bound
+  functions.
+</p>
+
+<p>It runs the passed function in a separate thread, returning a coroutine.</p>
+
+<p>
+  <code>sleep()</code> releases the GIL so control can pass back to the main
+  thread.
+</p>
+`,
+    },
+
+    {
+      preface: `<p>Know the differences between coroutines and tasks?</p>
+`,
+      code: `import asyncio
+
+
+async def foo():
+    print("in foo")
+
+
+async def main():
+    asyncio.create_task(foo())
+    print("in main")
+
+
+asyncio.run(main())
+`,
+      output: `in main
+in foo
+`,
+      explanation: `<p><code>create_task()</code> schedules the task for execution.</p>
+
+<p>But the main coroutine keeps control.</p>
+`,
+    },
+
+    {
+      preface: `<p>How about this?</p>
+`,
+      code: `import asyncio
+
+
+async def foo():
+    print("in foo")
+
+
+async def main():
+    await asyncio.create_task(foo())
+    print("in main")
+
+
+asyncio.run(main())
+`,
+      output: `in foo
+in main
+`,
+      explanation: `<p>Awaiting a task passes control to the event loop.</p>
+`,
+    },
+
+    {
+      preface: `<p>And this?</p>
+`,
+      code: `import asyncio
+
+
+async def foo():
+    print("in foo")
+
+
+async def bar():
+    print("in bar")
+
+
+async def main():
+    asyncio.create_task(foo())
+    await bar()
+
+
+asyncio.run(main())
+`,
+      output: `in bar
+in foo
+`,
+      explanation: `<p>Awaiting a coroutine doesn't pass control to the event loop.</p>
+`,
+    },
+
+    {
+      preface: `<p>Last one on this theme.</p>
+`,
+      code: `import asyncio
+
+
+async def foo():
+    print("in foo")
+
+
+async def bar():
+    print("in bar")
+
+
+async def main():
+    asyncio.create_task(foo())
+    await asyncio.create_task(bar())
+
+
+asyncio.run(main())
+`,
+      output: `in foo
+in bar
+`,
+      explanation: `<p>Awaiting a task passes control to the event loop.</p>
+`,
+    },
+
+    {
+      preface: `<p>What if awaitables go bad?</p>
+`,
+      code: `import asyncio
+
+
+async def foo():
+    raise Exception
+
+
+async def bar():
+    await asyncio.sleep(3)
+    print("here")
+
+
+async def main():
+    await asyncio.gather(foo(), bar())
+    print("done")
+
+
+asyncio.run(main())
+`,
+      output: `Traceback (most recent call last):
+  ...
+Exception
+`,
+      explanation: `<p>
+  By default, <code>gather()</code> propagates the first raised exception, but
+  <em>doesn't</em> cancel its other awaitables.
+</p>
+<p>
+  However, when the exception propagates to <code>asyncio.run()</code>,
+  <em>it</em> cancels any remaining awaitables.
+</p>
+`,
+    },
+  ],
+
   sockets: [
-    
     {
       preface: `<p>What does this output?</p>
 `,
@@ -24,23 +753,12 @@ Thread(target=client).start()
 conn, _ = srv.accept()
 print(conn.recv(1))
 `,
-      answers: [
-        `b'x'
+      output: `b'x'
 `,
-        `Not me!
-
-(Tip: answer via 1, 2, 3.)
-`,
-        `Not me!
-
-(Tip: advance via <Space> or <Enter>.)
-`,
-      ],
-      correct: 0,
       explanation: `<p>A minimal example of socket communication.</p>
 `,
     },
-    
+
     {
       preface: `<p>How about this?</p>
 `,
@@ -58,19 +776,12 @@ Thread(target=client).start()
 conn, _ = srv.accept()
 print(conn.recv(1))
 `,
-      answers: [
-        `b''
+      output: `b'x'
 `,
-        `None
-`,
-        `b'x'
-`,
-      ],
-      correct: 2,
       explanation: `<p>As before, but taking advantage of convenience functions.</p>
 `,
     },
-    
+
     {
       preface: `<p>Let's dig deeper. Output?</p>
 `,
@@ -89,21 +800,10 @@ conn, _ = srv.accept()
 print(type(srv).__name__)
 print(type(conn).__name__)
 `,
-      answers: [
-        `socket
+      output: `socket
 socket
 socket
 `,
-        `socket
-connection
-connection
-`,
-        `ServerSocket
-ClientSocket
-ClientSocket
-`,
-      ],
-      correct: 0,
       explanation: `<p>
   Sockets can play two roles: servers (switchboard operators) and clients
   (connection endpoints).
@@ -112,7 +812,7 @@ ClientSocket
 <p>But they're all just sockets.</p>
 `,
     },
-    
+
     {
       preface: `<p><code>accept()</code> returns a new local socket, but at what address?</p>
 `,
@@ -129,19 +829,12 @@ Thread(target=client).start()
 conn, _ = srv.accept()
 print(conn.getsockname())
 `,
-      answers: [
-        `('127.0.0.1', 44444)
+      output: `('127.0.0.1', 44444)
 `,
-        `('0.0.0.0', 44444)
-`,
-        `('127.0.0.1', 0)
-`,
-      ],
-      correct: 0,
       explanation: `<p>New socket. Same address.</p>
 `,
     },
-    
+
     {
       preface: `<p>How far can you get without a peer?</p>
 `,
@@ -160,24 +853,16 @@ def client():
 srv = socket.create_server(("127.0.0.1", 44444))
 Thread(target=client).start()
 `,
-      answers: [
-        `connected
-...
-`,
-        `connected
+      output: `connected
 sent
 `,
-        `...
-`,
-      ],
-      correct: 1,
       explanation: `<p>
   No <code>accept()</code>. But it's the <em>kernel</em> that handshakes and
   buffers, so the client can still connect and send.
 </p>
 `,
     },
-    
+
     {
       preface: `<p>How do <code>recv()</code> work?</p>
 `,
@@ -197,24 +882,15 @@ conn, _ = srv.accept()
 print(conn.recv(1))
 print(conn.recv(1))
 `,
-      answers: [
-        `b'x'
-ConnectionClosedError: [Errno NN] Connection closed by peer
-`,
-        `b'x'
-...
-`,
-        `b'x'
+      output: `b'x'
 b''
 `,
-      ],
-      correct: 2,
       explanation: `<p>
   <code>recv()</code> returns empty when the peer has closed the connection.
 </p>
 `,
     },
-    
+
     {
       preface: `<p>What if there's nothing to receive yet?</p>
 `,
@@ -235,27 +911,17 @@ conn, _ = srv.accept()
 print("here")
 print(conn.recv(1))
 `,
-      answers: [
-        `<~3s>
-here
-b'x'
-`,
-        `here
-b''
-`,
-        `here
+      output: `here
 <~3s>
 b'x'
 `,
-      ],
-      correct: 2,
       explanation: `<p>
   <code>recv(n)</code> blocks until data is available, then returns up to
   <code>n</code> bytes.
 </p>
 `,
     },
-    
+
     {
       preface: `<p>Double trouble.</p>
 `,
@@ -277,27 +943,16 @@ Thread(target=client).start()
 conn, _ = srv.accept()
 print(conn.recv(2))
 `,
-      answers: [
-        `<~1s>
+      output: `<~1s>
 b'x'
 `,
-        `<~1s>
-b'x'
-<~1s>
-b'y'
-`,
-        `<~2s>
-b'xy'
-`,
-      ],
-      correct: 0,
       explanation: `<p>
   To repeat: <code>recv(n)</code> blocks until data is available, then returns
   up to <code>n</code> bytes.
 </p>
 `,
     },
-    
+
     {
       preface: `<p>What if no one comes to the party?</p>
 `,
@@ -307,15 +962,8 @@ srv = socket.create_server(("127.0.0.1", 44444))
 conn, _ = srv.accept()
 print(conn)
 `,
-      answers: [
-        `ConnectionRefusedError
+      output: `...
 `,
-        `None
-`,
-        `...
-`,
-      ],
-      correct: 2,
       explanation: `<p>By default sockets are blocking.</p>
 
 <p>
@@ -324,7 +972,7 @@ print(conn)
 </p>
 `,
     },
-    
+
     {
       preface: `<p>If it doesn't block, what <em>does</em> it do?</p>
 `,
@@ -335,24 +983,17 @@ srv.setblocking(False)
 conn, _ = srv.accept()
 print(conn)
 `,
-      answers: [
-        `...
-`,
-        `Traceback (most recent call last):
+      output: `Traceback (most recent call last):
   ...
 BlockingIOError: [Errno NN] Resource temporarily unavailable
 `,
-        `None
-`,
-      ],
-      correct: 1,
       explanation: `<p>
   For a non-blocking socket, operations fail if they can't be completed
   immediately.
 </p>
 `,
     },
-    
+
     {
       preface: ``,
       code: `import socket
@@ -377,18 +1018,9 @@ print(conn.recv(1))
 conn.close()
 srv1.close()
 `,
-      answers: [
-        `b'x'
+      output: `b'x'
 OSError: [Errno NN] Address already in use
 `,
-        `b'x
-b''
-`,
-        `b'x'
-b'x'
-`,
-      ],
-      correct: 0,
       explanation: `<p>
   The kernel puts the active closer in <code>TIME_WAIT</code> for a while, else
   delayed packets might bleed into fresh connections.
@@ -400,7 +1032,7 @@ b'x'
 </p>
 `,
     },
-    
+
     {
       preface: ``,
       code: `import socket
@@ -418,19 +1050,12 @@ conn, _ = srv.accept()
 srv.close()
 print(conn.recv(1))
 `,
-      answers: [
-        `b'x'
+      output: `b'x'
 `,
-        `b''
-`,
-        `OSError
-`,
-      ],
-      correct: 0,
       explanation: `<p><code>srv</code> spun off <code>conn</code>, but they're independent.</p>
 `,
     },
-    
+
     {
       preface: `<p>What if we <code>listen()</code> without a <code>bind()</code>?</p>
 `,
@@ -441,1034 +1066,13 @@ sock.listen()
 ip, _ = sock.getsockname()
 print(ip)
 `,
-      answers: [
-        `ArgumentError
+      output: `0.0.0.0
 `,
-        `0.0.0.0
-`,
-        `127.0.0.1
-`,
-      ],
-      correct: 1,
       explanation: `<p>
   <code>0.0.0.0</code> is the IPv4 wildcard address, meaning "listen on all the
   host's IPs". The kernel chooses an ephemeral port.
 </p>
 `,
     },
-    
   ],
-  
-  concurrency: [
-    
-    {
-      preface: `<p>What does this output?</p>
-`,
-      code: `from time import sleep
-
-sleep(3)
-print("done")
-sleep(3)
-print("done")
-print("here")
-`,
-      answers: [
-        `<~3s>
-done
-<~3s>
-done
-here
-`,
-        `Not me!
-
-(Tip: advance via <Space> or <Enter>.)
-`,
-        `Not me!
-
-(Tip: answer via 1, 2, 3.)
-`,
-      ],
-      correct: 0,
-      explanation: `<p>One process, one thread, no event loop.</p>
-
-<p>Simple. Slow.</p>
-`,
-    },
-    
-    {
-      preface: `<p>Let's move the work into threads. Output?</p>
-`,
-      code: `from threading import Thread
-from time import sleep
-
-
-def io_bound():
-    sleep(3)
-    print("done")
-
-
-thread1 = Thread(target=io_bound)
-thread2 = Thread(target=io_bound)
-thread1.start()
-thread2.start()
-print("here")
-`,
-      answers: [
-        `<~3s>
-here
-done
-done
-`,
-        `here
-<~3s>
-done
-done
-`,
-        `<~3s>
-done
-<~3s>
-done
-here
-`,
-      ],
-      correct: 1,
-      explanation: `<p>A thread runs only when it holds the Global Interpreter Lock.</p>
-
-<p>
-  The running thread is paused regularly, or when it makes a syscall, and a
-  ready thread gets the GIL and runs. Interleaved, not parallel.
-</p>
-
-<p>
-  So: when <code>thread1</code> and <code>thread2</code> sleep, the main thread
-  runs.
-</p>
-`,
-    },
-    
-    {
-      preface: `<p>What if we <code>join()</code> them?</p>
-`,
-      code: `from threading import Thread
-from time import sleep
-
-
-def io_bound():
-    sleep(3)
-    print("done")
-
-
-thread1 = Thread(target=io_bound)
-thread2 = Thread(target=io_bound)
-thread1.start()
-thread1.join()
-thread2.start()
-thread2.join()
-print("here")
-`,
-      answers: [
-        `<~3s>
-done
-done
-here
-`,
-        `here
-<~3s>
-done
-done
-`,
-        `<~3s>
-done
-<~3s>
-done
-here
-`,
-      ],
-      correct: 2,
-      explanation: `<p><code>join()</code> blocks until the receiver completes.</p>
-`,
-    },
-    
-    {
-      preface: `<p>Does re-ordering make a difference?</p>
-`,
-      code: `from threading import Thread
-from time import sleep
-
-
-def io_bound():
-    sleep(3)
-    print("done")
-
-
-thread1 = Thread(target=io_bound)
-thread2 = Thread(target=io_bound)
-thread1.start()
-thread2.start()
-thread1.join()
-thread2.join()
-print("here")
-`,
-      answers: [
-        `<~3s>
-done
-done
-here
-`,
-        `here
-<~3s>
-done
-done
-`,
-        `<~3s>
-done
-<~3s>
-done
-here
-`,
-      ],
-      correct: 0,
-      explanation: `<p>
-  <code>thread1.join()</code> blocks the main thread, but not
-  <code>thread2</code>.
-</p>
-
-<p>
-  <code>thread1</code> and <code>thread2</code> are io-bound, so interleaving
-  helps.
-</p>
-`,
-    },
-    
-    {
-      preface: `<p>How about cpu-bound threads?</p>
-`,
-      code: `from threading import Thread
-
-
-def cpu_bound():
-    # assume the sum takes 3s of cpu
-    sum(i**2 for i in range(2**25))
-    print("done")
-
-
-thread1 = Thread(target=cpu_bound)
-thread2 = Thread(target=cpu_bound)
-thread1.start()
-thread2.start()
-print("here")
-`,
-      answers: [
-        `<~6s>
-done
-done
-here
-`,
-        `here
-<~6s>
-done
-done
-`,
-        `here
-<~3s>
-done
-done
-`,
-      ],
-      correct: 1,
-      explanation: `<p>
-  The main thread runs when <code>thread1</code> and <code>thread2</code> are
-  paused.
-</p>
-
-<p>
-  <code>thread1</code> and <code>thread2</code> are cpu-bound, so interleaving
-  doesn't help.
-</p>
-`,
-    },
-    
-    {
-      preface: `<p>Ok, let's <code>join()</code> again.</p>
-`,
-      code: `from threading import Thread
-
-
-def cpu_bound():
-    # assume the sum takes 3s of cpu
-    sum(i**2 for i in range(2**25))
-    print("done")
-
-
-thread1 = Thread(target=cpu_bound)
-thread2 = Thread(target=cpu_bound)
-thread1.start()
-thread1.join()
-thread2.start()
-thread2.join()
-print("here")
-`,
-      answers: [
-        `<~3s>
-done
-done
-here
-`,
-        `<~3s>
-done
-<~3s>
-done
-here
-`,
-        `here
-<~6s>
-done
-done
-`,
-      ],
-      correct: 1,
-      explanation: `<p>Same as before: <code>join()</code> blocks until the receiver completes.</p>
-`,
-    },
-    
-    {
-      preface: `<p>Does re-ordering make a difference?</p>
-`,
-      code: `from threading import Thread
-
-
-def cpu_bound():
-    # assume the sum takes 3s of cpu
-    sum(i**2 for i in range(2**25))
-    print("done")
-
-
-thread1 = Thread(target=cpu_bound)
-thread2 = Thread(target=cpu_bound)
-thread1.start()
-thread2.start()
-thread1.join()
-thread2.join()
-print("here")
-`,
-      answers: [
-        `<~3s>
-done
-<~3s>
-done
-here
-`,
-        `<~6s>
-done
-done
-here
-`,
-        `here
-<~3s>
-done
-<~3s>
-done
-`,
-      ],
-      correct: 1,
-      explanation: `<p>
-  <code>thread1.join()</code> blocks the main thread, not <code>thread2</code>.
-</p>
-
-<p>But they're still cpu-bound so the total time is unchanged.</p>
-`,
-    },
-    
-    {
-      preface: `<p>Same as the previous question, no?</p>
-`,
-      code: `from threading import Thread
-
-
-def cpu_bound():
-    # assume the sum takes 3s of cpu
-    sum(range(2**25))
-    print("done")
-
-
-thread1 = Thread(target=cpu_bound)
-thread2 = Thread(target=cpu_bound)
-thread1.start()
-thread2.start()
-thread1.join()
-thread2.join()
-print("here")
-`,
-      answers: [
-        `<~6s>
-done
-done
-here
-`,
-        `<~3s>
-done
-<~3s>
-done
-here
-`,
-        `<~3s>
-done
-done
-here
-`,
-      ],
-      correct: 1,
-      explanation: `<p>
-  The interpreter doesn't pause a thread while it's running native code, like
-  <code>sum()</code> does.
-</p>
-`,
-    },
-    
-    {
-      preface: `<p>What if threads go bad?</p>
-`,
-      code: `from threading import Thread
-
-
-def bad():
-    raise Exception
-
-
-thread = Thread(target=bad)
-thread.start()
-thread.join()
-print("here")
-`,
-      answers: [
-        `here
-`,
-        `Exception in thread Thread-1 (bad):
-Traceback (most recent call last):
-  ...
-Exception
-here
-`,
-        `Exception in thread Thread-1 (bad):
-Traceback (most recent call last):
-  ...
-Exception
-`,
-      ],
-      correct: 1,
-      explanation: `<p>
-  <code>threading.excepthook()</code> prints on stderr an exception raised by
-  <code>Thread.run()</code>.
-</p>
-
-<p>
-  But the exception doesn't propagate to the main thread, so
-  <code>here</code> is still printed and the exit code is 0.
-</p>
-`,
-    },
-    
-    {
-      preface: `<p>Let's swap threads for processes.</p>
-`,
-      code: `from multiprocessing import Process
-from time import sleep
-
-
-def io_bound():
-    sleep(3)
-    print("done")
-
-
-if __name__ == "__main__":
-    # running on multicore machine
-    proc1 = Process(target=io_bound)
-    proc2 = Process(target=io_bound)
-    proc1.start()
-    proc2.start()
-    print("here")
-`,
-      answers: [
-        `<~3s>
-done
-<~3s>
-done
-here
-`,
-        `here
-<~6s>
-done
-done
-`,
-        `here
-<~3s>
-done
-done
-`,
-      ],
-      correct: 2,
-      explanation: `<p>Process objects run in separate processes, each with their own GIL.</p>
-
-<p>So they <em>can</em> run in parallel.</p>
-
-<p>But for io-bound work threads might be the better choice.</p>
-`,
-    },
-    
-    {
-      preface: `<p>What about cpu-bound work?</p>
-`,
-      code: `from multiprocessing import Process
-
-
-def cpu_bound():
-    # assume the sum takes 3s of cpu
-    sum(i**2 for i in range(2**25))
-    print("done")
-
-
-if __name__ == "__main__":
-    # running on multicore machine
-    proc1 = Process(target=cpu_bound)
-    proc2 = Process(target=cpu_bound)
-    proc1.start()
-    proc2.start()
-    proc1.join()
-    proc2.join()
-    print("here")
-`,
-      answers: [
-        `<~6s>
-done
-done
-here
-`,
-        `<~3s>
-done
-<~3s>
-done
-here
-`,
-        `<~3s>
-done
-done
-here
-`,
-      ],
-      correct: 2,
-      explanation: `<p>
-  <code>thread1</code> and <code>thread2</code> are cpu-bound, so running in
-  parallel helps.
-</p>
-`,
-    },
-    
-    {
-      preface: `<p>What if processes go bad?</p>
-`,
-      code: `from multiprocessing import Process
-
-
-def bad():
-    raise Exception
-
-
-if __name__ == "__main__":
-    proc = Process(target=bad)
-    proc.start()
-    proc.join()
-    print("here")
-`,
-      answers: [
-        `Process Process-1:
-Traceback (most recent call last):
-  ...
-Exception
-here
-`,
-        `Process Process-1:
-Traceback (most recent call last):
-  ...
-Exception
-`,
-        `here
-`,
-      ],
-      correct: 0,
-      explanation: `<p>
-  Same story as for threads: the exception is printed on stderr but doesn't
-  propagate to the main process.
-</p>
-`,
-    },
-    
-    {
-      preface: `<p>A third approach: <code>asyncio</code>.</p>
-`,
-      code: `import asyncio
-from time import sleep
-
-
-async def io_bound():
-    sleep(3)
-    print("done")
-
-
-async def main():
-    io_bound()
-    io_bound()
-    print("here")
-
-
-asyncio.run(main())
-`,
-      answers: [
-        `here
-`,
-        `<~3s>
-done
-<~3s>
-done
-here
-`,
-        `here
-<~3s>
-done
-done
-`,
-      ],
-      correct: 0,
-      explanation: `<p>
-  A function defined with <code>async def</code> is a coroutine function and
-  returns a coroutine.
-</p>
-
-<p>Just creating a coroutine doens't schedule it on the event loop.</p>
-`,
-    },
-    
-    {
-      preface: `<p>Ok, so let's <code>await</code>.</p>
-`,
-      code: `import asyncio
-from time import sleep
-
-
-async def io_bound():
-    sleep(3)
-    print("done")
-
-
-async def main():
-    await io_bound()
-    await io_bound()
-    print("here")
-
-
-asyncio.run(main())
-`,
-      answers: [
-        `here
-<~3s>
-done
-done
-`,
-        `<~3s>
-done
-done
-here
-`,
-        `<~3s>
-done
-<~3s>
-done
-here
-`,
-      ],
-      correct: 2,
-      explanation: `<p>Awaiting a coroutine blocks until it completes.</p>
-
-<p>No speedup yet.</p>
-`,
-    },
-    
-    {
-      preface: `<p>We need async-aware functions, like <code>asyncio.sleep()</code>, right?</p>
-`,
-      code: `import asyncio
-
-
-async def io_bound():
-    await asyncio.sleep(3)
-    print("here")
-
-
-async def main():
-    await io_bound()
-    await io_bound()
-    print("done")
-
-
-asyncio.run(main())
-`,
-      answers: [
-        `<~3s>
-here
-here
-done
-`,
-        `<~3s>
-here
-<~3s>
-here
-done
-`,
-        `done
-<~3s>
-here
-here
-`,
-      ],
-      correct: 1,
-      explanation: `<p>
-  <code>await asyncio.sleep()</code> does pass control to the event loop, but
-  there's no other work scheduled at that point.
-</p>
-`,
-    },
-    
-    {
-      preface: `<p>What if we <code>gather()</code> them instead?</p>
-`,
-      code: `import asyncio
-from time import sleep
-
-
-async def io_bound():
-    sleep(3)
-    print("done")
-
-
-async def main():
-    await asyncio.gather(io_bound(), io_bound())
-    print("here")
-
-
-asyncio.run(main())
-`,
-      answers: [
-        `<~3s>
-done
-done
-here
-`,
-        `<~3s>
-done
-<~3s>
-done
-here
-`,
-        `here
-<~3s>
-done
-done
-`,
-      ],
-      correct: 1,
-      explanation: `<p><code>gather()</code> runs the awaitables concurrently.</p>
-
-<p>
-  But still no speedup, because <code>sleep()</code> blocks the one and only
-  thread.
-</p>
-`,
-    },
-    
-    {
-      preface: `<p>
-  What if we <code>gather()</code> <em>and</em> <code>asyncio.sleep()</code>?
-</p>
-`,
-      code: `import asyncio
-
-
-async def io_bound():
-    await asyncio.sleep(3)
-    print("done")
-
-
-async def main():
-    await asyncio.gather(io_bound(), io_bound())
-    print("here")
-
-
-asyncio.run(main())
-`,
-      answers: [
-        `<~3s>
-done
-<~3s>
-done
-here
-`,
-        `here
-<~3s>
-done
-done
-`,
-        `<~3s>
-done
-done
-here
-`,
-      ],
-      correct: 2,
-      explanation: `<p>Speedup at last!</p>
-`,
-    },
-    
-    {
-      preface: `<p>Remember threads?</p>
-`,
-      code: `import asyncio
-from time import sleep
-
-
-def io_bound():
-    sleep(3)
-    print("done")
-
-
-async def main():
-    await asyncio.gather(
-        asyncio.to_thread(io_bound),
-        asyncio.to_thread(io_bound),
-    )
-    print("here")
-
-
-asyncio.run(main())
-`,
-      answers: [
-        `here
-<~3s>
-done
-done
-`,
-        `<~3s>
-done
-done
-here
-`,
-        `<~3s>
-done
-<~3s>
-done
-here
-`,
-      ],
-      correct: 1,
-      explanation: `<p>
-  <code>asyncio.to_thread()</code> is useful for async-unaware io-bound
-  functions.
-</p>
-
-<p>It runs the passed function in a separate thread, returning a coroutine.</p>
-
-<p>
-  <code>sleep()</code> releases the GIL so control can pass back to the main
-  thread.
-</p>
-`,
-    },
-    
-    {
-      preface: `<p>Know the differences between coroutines and tasks?</p>
-`,
-      code: `import asyncio
-
-
-async def foo():
-    print("in foo")
-
-
-async def main():
-    asyncio.create_task(foo())
-    print("in main")
-
-
-asyncio.run(main())
-`,
-      answers: [
-        `it depends
-`,
-        `in main
-in foo
-`,
-        `in foo
-in main
-`,
-      ],
-      correct: 1,
-      explanation: `<p><code>create_task()</code> schedules the task for execution.</p>
-
-<p>But the main coroutine keeps control.</p>
-`,
-    },
-    
-    {
-      preface: `<p>How about this?</p>
-`,
-      code: `import asyncio
-
-
-async def foo():
-    print("in foo")
-
-
-async def main():
-    await asyncio.create_task(foo())
-    print("in main")
-
-
-asyncio.run(main())
-`,
-      answers: [
-        `it depends
-`,
-        `in foo
-in main
-`,
-        `in main
-in foo
-`,
-      ],
-      correct: 1,
-      explanation: `<p>Awaiting a task passes control to the event loop.</p>
-`,
-    },
-    
-    {
-      preface: `<p>And this?</p>
-`,
-      code: `import asyncio
-
-
-async def foo():
-    print("in foo")
-
-
-async def bar():
-    print("in bar")
-
-
-async def main():
-    asyncio.create_task(foo())
-    await bar()
-
-
-asyncio.run(main())
-`,
-      answers: [
-        `in foo
-in bar
-`,
-        `in bar
-in foo
-`,
-        `it depends
-`,
-      ],
-      correct: 1,
-      explanation: `<p>Awaiting a coroutine doesn't pass control to the event loop.</p>
-`,
-    },
-    
-    {
-      preface: `<p>Last one on this theme.</p>
-`,
-      code: `import asyncio
-
-
-async def foo():
-    print("in foo")
-
-
-async def bar():
-    print("in bar")
-
-
-async def main():
-    asyncio.create_task(foo())
-    await asyncio.create_task(bar())
-
-
-asyncio.run(main())
-`,
-      answers: [
-        `in bar
-in foo
-`,
-        `it depends
-`,
-        `in foo
-in bar
-`,
-      ],
-      correct: 2,
-      explanation: `<p>Awaiting a task passes control to the event loop.</p>
-`,
-    },
-    
-    {
-      preface: `<p>What if awaitables go bad?</p>
-`,
-      code: `import asyncio
-
-
-async def foo():
-    raise Exception
-
-
-async def bar():
-    await asyncio.sleep(3)
-    print("here")
-
-
-async def main():
-    await asyncio.gather(foo(), bar())
-    print("done")
-
-
-asyncio.run(main())
-`,
-      answers: [
-        `<~3s>
-here
-done
-`,
-        `Traceback (most recent call last):
-  ...
-Exception
-`,
-        `Traceback (most recent call last):
-  ...
-Exception
-done
-`,
-      ],
-      correct: 1,
-      explanation: `<p>
-  By default, <code>gather()</code> propagates the first raised exception, but
-  <em>doesn't</em> cancel its other awaitables.
-</p>
-<p>
-  However, when the exception propagates to <code>asyncio.run()</code>,
-  <em>it</em> cancels any remaining awaitables.
-</p>
-`,
-    },
-    
-  ],
-  
 };

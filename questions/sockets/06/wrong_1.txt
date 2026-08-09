@@ -1,2 +1,0 @@
-b'x'
-ConnectionClosedError: [Errno NN] Connection closed by peer
