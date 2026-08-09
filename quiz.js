@@ -16,7 +16,7 @@ class Quiz {
       this.continueFromSavedButton.addEventListener("click", () => {
         this.currentQuiz = savedState.title;
         this.currentQuestion = savedState.currentQuestion;
-        this.answers = savedState.answers;
+        this.grades = savedState.grades;
         this.questions = QUESTIONS_PER_QUIZ[this.currentQuiz];
         this.startQuiz();
       });
@@ -38,20 +38,16 @@ class Quiz {
 
     this.codeDisplay = document.getElementById("code-display");
     this.prefaceText = document.getElementById("preface-text");
-    this.nextButton = document.getElementById("next-button");
-    this.answerButtons = [
-      document.getElementById("answer-0"),
-      document.getElementById("answer-1"),
-      document.getElementById("answer-2"),
-    ];
-    this.answerButtonTexts = [
-      document.getElementById("answer-0-text"),
-      document.getElementById("answer-1-text"),
-      document.getElementById("answer-2-text"),
-    ];
+    this.revealButton = document.getElementById("reveal-button");
+    this.outputSection = document.getElementById("output-section");
+    this.outputText = document.getElementById("output-text");
     this.explanationSection = document.getElementById("explanation-section");
     this.explanationText = document.getElementById("explanation-text");
-    this.finishButton = document.getElementById("finish-button");
+    this.gradingSection = document.getElementById("grading-section");
+    this.correctButton = document.getElementById("correct-button");
+    this.incorrectButton = document.getElementById("incorrect-button");
+    this.nextButtonSection = document.getElementById("next-button-section");
+    this.nextButton = document.getElementById("next-button");
     this.navBar = document.getElementById("nav-bar");
 
     this.continueDialog = document.getElementById("continue-dialog");
@@ -128,22 +124,22 @@ class Quiz {
     // So the direct cause of behaviour is always clicks.
     // We need guards though, e.g. to prevent clicking disabled or hidden buttons.
     document.addEventListener("keydown", (event) => {
-      // Enter or Space to finish, restart, or move to next question
+      // Enter to finish, restart, or move to next question
       // Use `else if` even when the conditions are statically incompatible to prevent races.
-      if (event.key === "Enter" || event.key === " ") {
-        if (this.nextButton.style.display === "block") {
+      if (event.key === "Enter") {
+        if (this.nextButton.hidden === false && this.nextButton.disabled === false) {
           event.preventDefault();
           this.nextButton.click();
-        } else if (
-          this.finishButton.style.display === "block" &&
-          this.finalScoreSection.hidden
-        ) {
-          event.preventDefault();
-          this.finishButton.click();
         } else if (!this.finalScoreSection.hidden) {
           event.preventDefault();
           this.restartButton.click();
         }
+      }
+
+      // Space to toggle output and discussion.
+      if (event.key === " " && !this.mainContent.hidden) {
+        event.preventDefault();
+        this.revealButton.click();
       }
 
       // Arrow keys to move between viewable questions.
@@ -166,15 +162,16 @@ class Quiz {
         const navButton = this.navButtons[this.viewedQuestion + 1];
         navButton.click();
       }
-      // Number keys to select answers.
-      if (
-        event.key >= "1" &&
-        event.key <= this.answerButtons.length.toString() &&
-        !this.answerButtons[0].disabled
-      ) {
+
+      // Number keys to grade answer.
+      if (event.key === "0" && !this.incorrectButton.disabled) {
         event.preventDefault();
-        const answerIndex = parseInt(event.key) - 1;
-        this.answerButtons[answerIndex].click();
+        this.incorrectButton.click();
+      }
+
+      if (event.key === "1" && !this.correctButton.disabled) {
+        event.preventDefault();
+        this.correctButton.click();
       }
     });
 
@@ -183,31 +180,47 @@ class Quiz {
         // Set quiz-specific state.
         this.currentQuiz = button.textContent;
         this.questions = QUESTIONS_PER_QUIZ[this.currentQuiz];
-        this.answers = Array(this.questions.length).fill(null);
+        this.grades = Array(this.questions.length).fill(null);
 
         this.startQuiz();
       });
     });
 
-    this.answerButtons.forEach((button, index) => {
-      button.addEventListener("click", () => {
-        this.selectAnswer(index);
-      });
+    this.revealButton.addEventListener("click", () => {
+      this.hasRevealedAnswer = true;
+
+      this.outputSection.hidden = false;
+      this.explanationSection.hidden = false;
+      this.gradingSection.hidden = false;
+      this.nextButtonSection.hidden = false;
+
+      this.revealButton.disabled = true;
+      this.correctButton.disabled = false;
+      this.incorrectButton.disabled = false;
+      this.nextButton.disabled = true;
     });
 
-    this.nextButton.addEventListener("click", () => this.nextQuestion());
-    this.finishButton.addEventListener("click", () => this.finishQuiz());
+    this.correctButton.addEventListener("click", () => this.grade(true));
+    this.incorrectButton.addEventListener("click", () => this.grade(false));
+
+    this.nextButton.addEventListener("click", () => {
+      if (this.currentQuestion === this.questions.length - 1) {
+        this.finishQuiz();
+      } else {
+        this.nextQuestion();
+      }
+    });
     this.restartButton.addEventListener("click", () => this.restart());
     this.restartFromSavedButton.addEventListener("click", () => this.restart());
   }
 
   startQuiz() {
+    this.hasRevealedAnswer = false;
     this.populateNavBar();
     this.navButtons.forEach((button, index) =>
       button.addEventListener("click", () => this.loadQuestion(index)),
     );
     this.showMainContent();
-    this.finishButton.style.display = "none";
     for (let i = 0; i <= this.currentQuestion; i++) {
       this.navButtons[i].disabled = false;
     }
@@ -215,24 +228,20 @@ class Quiz {
       this.navButtons[i].disabled = true;
     }
     // Restore nav button classes for previously answered questions
-    for (let i = 0; i < this.answers.length; i++) {
+    for (let i = 0; i < this.grades.length; i++) {
       const navBtn = this.navButtons[i];
-      navBtn.classList.remove("viewing", "correct");
-      if (
-        this.answers[i] !== null &&
-        this.answers[i] === this.questions[i].correct
-      ) {
+      navBtn.classList.remove("viewing", "correct", "incorrect");
+      if (this.grades[i]) {
         navBtn.classList.add("correct");
+      } else if (this.grades[i] === false) {
+        navBtn.classList.add("incorrect");
       }
     }
     this.loadQuestion(this.currentQuestion);
   }
 
   computeScore() {
-    return this.answers.filter(
-      (selectedAnswer, questionIndex) =>
-        selectedAnswer === this.questions[questionIndex].correct,
-    ).length;
+    return this.grades.filter(Boolean).length;
   }
 
   restart() {
@@ -242,8 +251,8 @@ class Quiz {
     this.showSplashScreen();
   }
 
-  hasAnsweredCurrentQuestion() {
-    return this.answers[this.currentQuestion] !== null;
+  hasGradedCurrentQuestion() {
+    return this.grades[this.currentQuestion] !== null;
   }
 
   loadQuestion(index) {
@@ -253,14 +262,24 @@ class Quiz {
     this.codeDisplay.removeAttribute("data-highlighted"); // else highlightjs skips re-highlighting
     hljs.highlightElement(this.codeDisplay);
     this.prefaceText.innerHTML = question.preface;
-    this.answerButtonTexts.forEach((samp, index) => {
-      samp.textContent = question.answers[index];
-    });
+    this.outputText.textContent = question.output;
+    this.explanationText.innerHTML = question.explanation;
 
-    // Clear answer button classes
-    this.answerButtons.forEach((button) => {
-      button.classList.remove("selected", "correct");
-    });
+    this.nextButton.textContent = (index === this.questions.length - 1) ? ">>" : ">"
+
+    // Update grading button classes.
+    // Maybe we'll hide the buttons but clearest to reset the classes in any case.
+    if (this.grades[index] === true) {
+      this.correctButton.classList.add("selected");
+      this.incorrectButton.classList.remove("selected");
+    } else if (this.grades[index] === false) {
+      this.correctButton.classList.remove("selected");
+      this.incorrectButton.classList.add("selected");
+    } else {
+      // not yet answered
+      this.correctButton.classList.remove("selected");
+      this.incorrectButton.classList.remove("selected");
+    }
 
     // Update nav bar: mark which question is being viewed
     this.navButtons.forEach((btn) => btn.classList.remove("viewing"));
@@ -268,82 +287,84 @@ class Quiz {
 
     if (index < this.currentQuestion) {
       // reviewing a previous question
-      this.answerButtons.forEach((button) => {
-        button.disabled = true;
-      });
-      const selectedIndex = this.answers[index];
-      this.answerButtons[selectedIndex].classList.add("selected");
-      this.answerButtons[question.correct].classList.add("correct");
-      this.explanationText.innerHTML = question.explanation;
-      this.explanationSection.style.display = "block";
-      this.nextButton.style.display = "none";
+      this.outputSection.hidden = false;
+      this.explanationSection.hidden = false;
+      this.gradingSection.hidden = true;
+      this.nextButtonSection.hidden = true;
+
+      this.revealButton.disabled = true;
+      this.correctButton.disabled = true;
+      this.incorrectButton.disabled = true;
+      this.nextButton.disabled = true;
     } else if (
       index === this.currentQuestion &&
-      !this.hasAnsweredCurrentQuestion()
+      !this.hasRevealedAnswer
     ) {
-      // answering the current question
-      this.answerButtons.forEach((button) => {
-        button.disabled = false;
-      });
-      this.explanationSection.style.display = "none";
-      this.nextButton.style.display = "none";
+      // not yet revealed answer to the current question
+      this.outputSection.hidden = true;
+      this.explanationSection.hidden = true;
+      this.gradingSection.hidden = true;
+      this.nextButtonSection.hidden = true;
+
+      this.revealButton.disabled = false;
+      this.correctButton.disabled = true;
+      this.incorrectButton.disabled = true;
+      this.nextButton.disabled = true;
     } else if (
       index === this.currentQuestion &&
-      this.hasAnsweredCurrentQuestion()
+      this.hasRevealedAnswer &&
+      !this.hasGradedCurrentQuestion()
     ) {
-      // reviewing the current question
-      this.answerButtons.forEach((button) => {
-        button.disabled = true;
-      });
-      const selectedIndex = this.answers[index];
-      this.answerButtons[selectedIndex].classList.add("selected");
-      this.answerButtons[question.correct].classList.add("correct");
-      this.explanationText.innerHTML = question.explanation;
-      this.explanationSection.style.display = "block";
-      if (this.currentQuestion === this.questions.length - 1) {
-        this.nextButton.style.display = "none";
-        this.finishButton.style.display = "block";
-      } else {
-        this.nextButton.style.display = "block";
-        this.finishButton.style.display = "none";
-      }
+      // revealed answer but not yet graded the current question
+      this.outputSection.hidden = false;
+      this.explanationSection.hidden = false;
+      this.gradingSection.hidden = false;
+      this.nextButtonSection.hidden = false;
+
+      this.revealButton.disabled = true;
+      this.correctButton.disabled = false;
+      this.incorrectButton.disabled = false;
+      this.nextButton.disabled = true;
+    } else if (
+      index === this.currentQuestion &&
+      this.hasRevealedAnswer &&
+      this.hasGradedCurrentQuestion()
+    ) {
+      // answered and graded the current question
+      this.outputSection.hidden = false;
+      this.explanationSection.hidden = false;
+      this.gradingSection.hidden = false;
+      this.nextButtonSection.hidden = false;
+
+      this.revealButton.disabled = true;
+      this.correctButton.disabled = true;
+      this.incorrectButton.disabled = true;
+      this.nextButton.disabled = false;
     }
   }
 
-  selectAnswer(selectedIndex) {
-    this.answerButtons.forEach((button) => {
-      button.disabled = true;
-    });
+  grade(correct) {
+    this.correctButton.disabled = true;
+    this.incorrectButton.disabled = true;
+    this.nextButton.disabled = false;
 
-    const question = this.questions[this.currentQuestion];
-    const correctIndex = question.correct;
-    const isCorrect = correctIndex === selectedIndex;
-    this.answers[this.currentQuestion] = selectedIndex;
+    if (correct) {
+      this.correctButton.classList.add("selected");
+    } else {
+      this.incorrectButton.classList.add("selected");
+    }
+
+    this.grades[this.currentQuestion] = correct;
     this.saveState();
 
-    // Update answer buttons: show selected and correct
-    this.answerButtons[selectedIndex].classList.add("selected");
-    this.answerButtons[correctIndex].classList.add("correct");
-
     // Update nav bar: mark this question as correct
-    if (isCorrect) {
-      const navBtn = this.navButtons[this.currentQuestion];
-      navBtn.classList.add("correct");
-    }
-
-    if (this.currentQuestion === this.questions.length - 1) {
-      this.nextButton.style.display = "none";
-      this.finishButton.style.display = "block";
-    } else {
-      this.nextButton.style.display = "block";
-      this.finishButton.style.display = "none";
-    }
-    this.explanationText.innerHTML = question.explanation;
-    this.explanationSection.style.display = "block";
+    const navBtn = this.navButtons[this.currentQuestion];
+    navBtn.classList.add(correct ? "correct" : "incorrect");
   }
 
   nextQuestion() {
     this.currentQuestion++;
+    this.hasRevealedAnswer = false;
     this.saveState();
     this.navButtons[this.currentQuestion].disabled = false;
     this.loadQuestion(this.currentQuestion);
@@ -380,14 +401,14 @@ class Quiz {
     const state = {
       title: this.currentQuiz,
       currentQuestion: this.currentQuestion,
-      answers: this.answers,
+      grades: this.grades,
     };
-    localStorage.setItem("python-fundamentals-quizzes", JSON.stringify(state));
+    localStorage.setItem("python-by-quiz", JSON.stringify(state));
   }
 
   loadState() {
     try {
-      const savedState = localStorage.getItem("python-fundamentals-quizzes");
+      const savedState = localStorage.getItem("python-by-quiz");
       if (savedState) {
         return JSON.parse(savedState);
       }
@@ -398,7 +419,7 @@ class Quiz {
   }
 
   clearState() {
-    localStorage.removeItem("python-fundamentals-quizzes");
+    localStorage.removeItem("python-by-quiz");
   }
 }
 
