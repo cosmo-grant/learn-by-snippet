@@ -1,4 +1,4 @@
-.PHONY: format questions view
+.PHONY: format questions view preview
 
 format:
 	uv tool run ruff format .
@@ -9,3 +9,6 @@ questions:
 
 view:
 	open https://cosmo-grant.github.io/python-by-quiz/
+
+preview:
+	live-server
