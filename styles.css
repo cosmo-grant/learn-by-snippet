@@ -394,12 +394,12 @@ pre {
 }
 
 #more-quizzes-button {
-  margin-top: var(--space-md);
-  padding: var(--space-sm) var(--space-lg);
+  margin-top: var(--space-lg);
+  padding: var(--space-sm) var(--space-md);
   font-size: var(--font-size-base);
-  color: #ffffff;
-  background-color: var(--color-primary);
-  border: none;
+  color: var(--color-text);
+  background-color: var(--color-bg);
+  border: 2px solid var(--color-border);
   border-radius: 4px;
 }
 
