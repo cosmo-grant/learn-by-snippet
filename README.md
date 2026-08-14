@@ -4,7 +4,7 @@
 
 ## What is this?
 
-A collection of quizzes about Python.
+A collection of Python quizzes.
 A practice project.
 A bit of fun.
 
@@ -23,6 +23,7 @@ And no one wants 50 question quizzes.
 
 For styling, yes, plus small tasks here and there.
 I wrote everything else, for better or worse, including all questions and explanations.
+
 I originally followed the example of [fstrings-wtf](https://github.com/mitsuhiko/fstrings-wtf/),
 though I've deviated a bit since.
 
@@ -41,7 +42,7 @@ I checked the snippets on a MacBook Pro M3.
 
 ## How did you check the snippets?
 
-[pypi.org/project/snippet-checker/](https://pypi.org/project/snippet-checker/)
+[snippet-checker](https://pypi.org/project/snippet-checker/)
 
 ## Found a bug?
 
