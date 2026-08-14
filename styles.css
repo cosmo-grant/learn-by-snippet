@@ -178,7 +178,7 @@ body {
   gap: 0.125rem;
   justify-content: center;
   max-width: 46rem;
-  margin: 0 auto var(--space-md);
+  margin: 0 auto var(--space-lg);
   padding: var(--space-lg) var(--space-lg) 0;
   overflow-x: auto;
 }
@@ -239,6 +239,7 @@ body {
 }
 
 #preface-text {
+  font-size: 1.2rem;
   margin-bottom: var(--space-md);
 }
 
