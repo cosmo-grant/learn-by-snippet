@@ -466,26 +466,12 @@ pre {
   margin: var(--space-md) var(--space-xs) 0;
   padding: var(--space-sm) var(--space-md);
   font-size: var(--font-size-base);
-  border: 1px solid var(--color-border);
+  color: var(--color-text);
+  background-color: var(--color-bg);
+  border: 2px solid var(--color-border);
   border-radius: 4px;
 }
 
-#continue-from-saved-button {
-  color: #ffffff;
-  background-color: var(--color-primary);
-  border-color: var(--color-primary);
-}
-
-#continue-from-saved-button:hover {
-  background-color: var(--color-primary-hover);
+#continue-dialog button:hover {
   border-color: var(--color-primary-hover);
-}
-
-#new-quiz-button {
-  color: var(--color-text);
-  background-color: var(--color-bg);
-}
-
-#new-quiz-button:hover {
-  background-color: var(--color-bg-secondary);
 }
