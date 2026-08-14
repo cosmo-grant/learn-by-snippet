@@ -30,7 +30,7 @@ a:focus-visible {
    CSS Custom Properties (Variables)
    
    Light mode is the default.
-   Dark mode overrides via media query below.
+   Dark mode overrides via media query.
    ------------------------------------------- */
 
 :root {
@@ -101,10 +101,6 @@ body {
   display: none !important;
 }
 
-/* -------------------------------------------
-   Splash Screen
-   ------------------------------------------- */
-
 #splash-screen {
   /* Center content vertically and horizontally */
   min-height: 100vh;
@@ -138,7 +134,6 @@ body {
   color: var(--color-primary-hover);
 }
 
-/* Quiz choices: one button per quiz, vertical list that scales with count */
 #quiz-choices {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
@@ -182,10 +177,6 @@ body {
   color: var(--color-primary);
 }
 
-/* -------------------------------------------
-   Navigation Bar
-   ------------------------------------------- */
-
 #nav-bar {
   display: flex;
   flex-wrap: nowrap;
@@ -214,34 +205,25 @@ body {
     color 0.1s;
 }
 
-/* Disabled: future questions user hasn't reached yet */
 #nav-bar button:disabled {
   opacity: 0.3;
   background-color: var(--color-bg-secondary);
   cursor: not-allowed;
 }
 
-/* Currently viewing this question - bold border */
 #nav-bar button.viewing {
   border-width: 3px;
   border-color: var(--color-text);
 }
 
-/* Answered correctly */
 #nav-bar button.correct {
   background-color: var(--color-correct);
   color: #ffffff;
 }
 
-/* Answered incorrectly */
 #nav-bar button.incorrect {
   background-color: var(--color-incorrect);
   color: #ffffff;
-}
-
-/* Viewing + correct: keep green, add bold border */
-#nav-bar button.viewing.correct {
-  border-color: var(--color-text);
 }
 
 /* Mobile: allow nav buttons to wrap instead of scroll */
@@ -252,10 +234,6 @@ body {
   }
 }
 
-/* -------------------------------------------
-   Main Content Layout
-   ------------------------------------------- */
-
 #main-content {
   position: relative;
   max-width: 44rem;
@@ -263,7 +241,6 @@ body {
   padding: 0.75rem var(--space-lg) var(--space-lg);
 }
 
-/* Preface text (question prompt) */
 #preface-text {
   margin-bottom: var(--space-md);
 }
@@ -272,11 +249,7 @@ body {
   margin: 0;
 }
 
-/* -------------------------------------------
-   Code Display
-   ------------------------------------------- */
-
-#code-row > pre {
+#snippet-pre {
   /* Fixed height so answers stay in same position */
   /* height = (lines × font-size × line-height) + (padding × 2) + buffer */
   height: calc(var(--max-snippet-lines) * 0.9375rem * 1.6 + 2rem + 0.25rem);
@@ -287,16 +260,13 @@ body {
 }
 
 @media (prefers-color-scheme: dark) {
-  #code-row > pre {
+  #snippet-pre {
     background: #0d1117;
   }
 }
 
-#code-display {
-  display: block;
-  width: 100%;
+#snippet-code {
   padding: var(--space-md);
-  font-family: var(--font-mono);
   font-size: 0.9375rem;
   line-height: 1.6;
   overflow-x: auto;
@@ -306,7 +276,6 @@ pre {
   margin: 0;
 }
 
-/* Reveal button */
 #reveal-button {
   display: block;
   margin: var(--space-lg) auto;
@@ -315,7 +284,7 @@ pre {
   border: none;
   color: var(--color-primary);
   cursor: pointer;
-  text-decoration: underline;
+  /* text-decoration: underline; */
   text-underline-offset: 0.2em;
 }
 
@@ -323,20 +292,25 @@ pre {
   color: var(--color-primary-hover);
 }
 
-/* Output */
-#output-section > pre {
+#reveal-button:disabled {
+  opacity: 0.3;
+  background-color: var(--color-bg-secondary);
+  cursor: not-allowed;
+}
+
+#output-pre {
   border: 1px solid var(--color-border);
   border-radius: 4px;
   background: #fff;
 }
 
 @media (prefers-color-scheme: dark) {
-  #output-section > pre {
+  #output-pre {
     background: #0d1117;
   }
 }
 
-#output-text {
+#output-samp {
   display: block;
   width: 100%;
   padding: var(--space-sm) var(--space-md);
@@ -345,10 +319,6 @@ pre {
   line-height: 1.6;
   overflow-x: auto;
 }
-
-/* -------------------------------------------
-   Grading Buttons
-   ------------------------------------------- */
 
 #grading-section {
   display: flex;
@@ -396,27 +366,20 @@ pre {
   color: #ffffff;
 }
 
-/* -------------------------------------------
-   Explanation Section
-   ------------------------------------------- */
-
-#explanation-section {
+#explanation {
   margin: var(--space-lg) 0;
-}
-
-#explanation-text {
   line-height: var(--line-height);
 }
 
-#explanation-text p {
+#explanation p {
   margin: 0 0 var(--space-sm) 0;
 }
 
-#explanation-text p:last-child {
+#explanation p:last-child {
   margin-bottom: 0;
 }
 
-#explanation-text code {
+#explanation code {
   font-family: var(--font-mono);
   font-size: 0.875em;
   background-color: var(--color-bg);
@@ -424,19 +387,10 @@ pre {
   border-radius: 3px;
 }
 
-/* -------------------------------------------
-   Action Buttons (Next, Restart)
-   ------------------------------------------- */
-
-/* Nav buttons container */
-#next-button-section {
-  display: flex;
-  gap: var(--space-sm);
-  margin-top: var(--space-md);
-}
-
 #next-button {
-  flex: 1;
+  display: block;
+  width: 100%;
+  margin-top: var(--space-md);
   height: 2.5rem;
   padding: 0;
   font-size: 1.5rem;
@@ -450,6 +404,12 @@ pre {
 #next-button:hover {
   color: var(--color-text);
   border-color: var(--color-text);
+}
+
+#next-button:disabled {
+  opacity: 0.3;
+  background-color: var(--color-bg-secondary);
+  cursor: not-allowed;
 }
 
 #restart-button {
@@ -466,10 +426,6 @@ pre {
 #restart-button:hover {
   background-color: var(--color-primary-hover);
 }
-
-/* -------------------------------------------
-   Final Score Section
-   ------------------------------------------- */
 
 #final-score-section {
   min-height: 100vh;
@@ -500,10 +456,6 @@ pre {
   font-size: 1rem;
   color: var(--color-text-muted);
 }
-
-/* -------------------------------------------
-   Continue Dialog
-   ------------------------------------------- */
 
 #continue-dialog {
   min-height: 100vh;

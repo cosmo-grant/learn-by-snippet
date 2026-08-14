@@ -36,17 +36,15 @@ class Quiz {
     this.finalScoreMessage = document.getElementById("final-score-message");
     this.restartButton = document.getElementById("restart-button");
 
-    this.codeDisplay = document.getElementById("code-display");
+    this.snippetCode = document.getElementById("snippet-code");
     this.prefaceText = document.getElementById("preface-text");
     this.revealButton = document.getElementById("reveal-button");
-    this.outputSection = document.getElementById("output-section");
-    this.outputText = document.getElementById("output-text");
-    this.explanationSection = document.getElementById("explanation-section");
-    this.explanationText = document.getElementById("explanation-text");
+    this.outputPre = document.getElementById("output-pre");
+    this.outputSamp = document.getElementById("output-samp");
+    this.explanation = document.getElementById("explanation");
     this.gradingSection = document.getElementById("grading-section");
     this.correctButton = document.getElementById("correct-button");
     this.incorrectButton = document.getElementById("incorrect-button");
-    this.nextButtonSection = document.getElementById("next-button-section");
     this.nextButton = document.getElementById("next-button");
     this.navBar = document.getElementById("nav-bar");
 
@@ -189,10 +187,10 @@ class Quiz {
     this.revealButton.addEventListener("click", () => {
       this.hasRevealedAnswer = true;
 
-      this.outputSection.hidden = false;
-      this.explanationSection.hidden = false;
+      this.outputPre.hidden = false;
+      this.explanation.hidden = false;
       this.gradingSection.hidden = false;
-      this.nextButtonSection.hidden = false;
+      this.nextButton.hidden = false;
 
       this.revealButton.disabled = true;
       this.correctButton.disabled = false;
@@ -258,12 +256,12 @@ class Quiz {
   loadQuestion(index) {
     const question = this.questions[index];
     this.viewedQuestion = index;
-    this.codeDisplay.textContent = question.code;
-    this.codeDisplay.removeAttribute("data-highlighted"); // else highlightjs skips re-highlighting
-    hljs.highlightElement(this.codeDisplay);
+    this.snippetCode.textContent = question.code;
+    this.snippetCode.removeAttribute("data-highlighted"); // else highlightjs skips re-highlighting
+    hljs.highlightElement(this.snippetCode);
     this.prefaceText.innerHTML = question.preface;
-    this.outputText.textContent = question.output;
-    this.explanationText.innerHTML = question.explanation;
+    this.outputSamp.textContent = question.output;
+    this.explanation.innerHTML = question.explanation;
 
     this.nextButton.textContent = (index === this.questions.length - 1) ? ">>" : ">"
 
@@ -287,10 +285,10 @@ class Quiz {
 
     if (index < this.currentQuestion) {
       // reviewing a previous question
-      this.outputSection.hidden = false;
-      this.explanationSection.hidden = false;
+      this.outputPre.hidden = false;
+      this.explanation.hidden = false;
       this.gradingSection.hidden = true;
-      this.nextButtonSection.hidden = true;
+      this.nextButton.hidden = true;
 
       this.revealButton.disabled = true;
       this.correctButton.disabled = true;
@@ -301,10 +299,10 @@ class Quiz {
       !this.hasRevealedAnswer
     ) {
       // not yet revealed answer to the current question
-      this.outputSection.hidden = true;
-      this.explanationSection.hidden = true;
+      this.outputPre.hidden = true;
+      this.explanation.hidden = true;
       this.gradingSection.hidden = true;
-      this.nextButtonSection.hidden = true;
+      this.nextButton.hidden = true;
 
       this.revealButton.disabled = false;
       this.correctButton.disabled = true;
@@ -316,10 +314,10 @@ class Quiz {
       !this.hasGradedCurrentQuestion()
     ) {
       // revealed answer but not yet graded the current question
-      this.outputSection.hidden = false;
-      this.explanationSection.hidden = false;
+      this.outputPre.hidden = false;
+      this.explanation.hidden = false;
       this.gradingSection.hidden = false;
-      this.nextButtonSection.hidden = false;
+      this.nextButton.hidden = false;
 
       this.revealButton.disabled = true;
       this.correctButton.disabled = false;
@@ -331,10 +329,10 @@ class Quiz {
       this.hasGradedCurrentQuestion()
     ) {
       // answered and graded the current question
-      this.outputSection.hidden = false;
-      this.explanationSection.hidden = false;
+      this.outputPre.hidden = false;
+      this.explanation.hidden = false;
       this.gradingSection.hidden = false;
-      this.nextButtonSection.hidden = false;
+      this.nextButton.hidden = false;
 
       this.revealButton.disabled = true;
       this.correctButton.disabled = true;
