@@ -6,7 +6,7 @@ class Quiz {
 
     const savedState = this.loadState();
     if (savedState) {
-      // Offer user choice to resume or start afresh.
+      // Offer user choice to continue or start afresh.
       this.showContinueDialog();
       this.savedTitleDialog.textContent = savedState.title;
       this.savedQuestionDialog.textContent = savedState.currentQuestion + 1;
@@ -34,7 +34,7 @@ class Quiz {
     this.finalScoreValue = document.getElementById("final-score-value");
     this.finalScoreMax = document.getElementById("final-score-max");
     this.finalScoreMessage = document.getElementById("final-score-message");
-    this.restartButton = document.getElementById("restart-button");
+    this.moreQuizzesButton = document.getElementById("more-quizzes-button");
 
     this.snippetCode = document.getElementById("snippet-code");
     this.prefaceText = document.getElementById("preface-text");
@@ -57,8 +57,8 @@ class Quiz {
     this.continueFromSavedButton = document.getElementById(
       "continue-from-saved-button",
     );
-    this.restartFromSavedButton = document.getElementById(
-      "restart-from-saved-button",
+    this.newQuizButton = document.getElementById(
+      "new-quiz-button",
     );
   }
 
@@ -133,7 +133,7 @@ class Quiz {
           this.nextButton.click();
         } else if (!this.finalScoreSection.hidden) {
           event.preventDefault();
-          this.restartButton.click();
+          this.moreQuizzesButton.click();
         }
       }
 
@@ -205,8 +205,8 @@ class Quiz {
         this.nextQuestion();
       }
     });
-    this.restartButton.addEventListener("click", () => this.restart());
-    this.restartFromSavedButton.addEventListener("click", () => this.restart());
+    this.moreQuizzesButton.addEventListener("click", () => this.restart());
+    this.newQuizButton.addEventListener("click", () => this.restart());
   }
 
   startQuiz() {
@@ -388,7 +388,7 @@ class Quiz {
   }
 
   // There is at most one quiz in progress.
-  // The user can either resume that quiz or start completely afresh (which clears saved state).
+  // The user can either continue that quiz or start completely afresh (which clears saved state).
   // saveState() should be called after any state-changing action.
   saveState() {
     const state = {

@@ -397,7 +397,7 @@ pre {
   background-color: var(--color-bg-secondary);
 }
 
-#restart-button {
+#more-quizzes-button {
   margin-top: var(--space-md);
   padding: var(--space-sm) var(--space-lg);
   font-size: var(--font-size-base);
@@ -407,7 +407,7 @@ pre {
   border-radius: 4px;
 }
 
-#restart-button:hover {
+#more-quizzes-button:hover {
   border-color: var(--color-primary-hover);
 }
 
@@ -485,11 +485,11 @@ pre {
   border-color: var(--color-primary-hover);
 }
 
-#restart-from-saved-button {
+#new-quiz-button {
   color: var(--color-text);
   background-color: var(--color-bg);
 }
 
-#restart-from-saved-button:hover {
+#new-quiz-button:hover {
   background-color: var(--color-bg-secondary);
 }
