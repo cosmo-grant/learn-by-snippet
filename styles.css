@@ -150,7 +150,6 @@ body {
   background-color: var(--color-bg);
   border: 2px solid var(--color-border);
   border-radius: 4px;
-  cursor: pointer;
   transition:
     background-color 0.1s,
     border-color 0.1s,
@@ -158,8 +157,7 @@ body {
 }
 
 #quiz-choices button:hover {
-  border-color: var(--color-primary);
-  color: var(--color-primary);
+  border-color: var(--color-primary-hover);
 }
 
 #splash-screen footer {
@@ -174,7 +172,7 @@ body {
 }
 
 #splash-screen footer a:hover {
-  color: var(--color-primary);
+  color: var(--color-primary-hover);
 }
 
 #nav-bar {
@@ -197,7 +195,6 @@ body {
   border-radius: 4px;
   background-color: var(--color-bg);
   color: var(--color-text);
-  cursor: pointer;
   font-size: 0.75rem;
   transition:
     background-color 0.1s,
@@ -208,7 +205,6 @@ body {
 #nav-bar button:disabled {
   opacity: 0.3;
   background-color: var(--color-bg-secondary);
-  cursor: not-allowed;
 }
 
 #nav-bar button.viewing {
@@ -224,6 +220,10 @@ body {
 #nav-bar button.incorrect {
   background-color: var(--color-incorrect);
   color: #ffffff;
+}
+
+#nav-bar button:hover:not(:disabled) {
+  border-color: var(--color-primary-hover);
 }
 
 /* Mobile: allow nav buttons to wrap instead of scroll */
@@ -283,17 +283,14 @@ pre {
   background: none;
   border: none;
   color: var(--color-primary);
-  cursor: pointer;
 }
 
-#reveal-button:hover {
+#reveal-button:hover:not(:disabled) {
   color: var(--color-primary-hover);
 }
 
 #reveal-button:disabled {
   opacity: 0.3;
-  background-color: var(--color-bg-secondary);
-  cursor: not-allowed;
 }
 
 #output-pre {
@@ -334,7 +331,6 @@ pre {
   background-color: var(--color-bg);
   border: 2px solid var(--color-border);
   border-radius: 4px;
-  cursor: pointer;
   transition:
     background-color 0.1s,
     border-color 0.1s,
@@ -343,13 +339,7 @@ pre {
 
 #correct-button:hover:not(:disabled),
 #incorrect-button:hover:not(:disabled) {
-  border-color: var(--color-text);
-  color: var(--color-text);
-}
-
-#correct-button:disabled,
-#incorrect-button:disabled {
-  cursor: default;
+  border-color: var(--color-primary-hover);
 }
 
 #correct-button.selected {
@@ -396,18 +386,15 @@ pre {
   background-color: var(--color-bg);
   border: 1px solid var(--color-border);
   border-radius: 4px;
-  cursor: pointer;
 }
 
-#next-button:hover {
-  color: var(--color-text);
-  border-color: var(--color-text);
+#next-button:hover:not(:disabled) {
+  border-color: var(--color-primary-hover);
 }
 
 #next-button:disabled {
   opacity: 0.3;
   background-color: var(--color-bg-secondary);
-  cursor: not-allowed;
 }
 
 #restart-button {
@@ -418,11 +405,10 @@ pre {
   background-color: var(--color-primary);
   border: none;
   border-radius: 4px;
-  cursor: pointer;
 }
 
 #restart-button:hover {
-  background-color: var(--color-primary-hover);
+  border-color: var(--color-primary-hover);
 }
 
 #final-score-section {
@@ -486,7 +472,6 @@ pre {
   font-size: var(--font-size-base);
   border: 1px solid var(--color-border);
   border-radius: 4px;
-  cursor: pointer;
 }
 
 #continue-from-saved-button {
