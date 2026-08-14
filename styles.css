@@ -45,7 +45,7 @@ a:focus-visible {
   --color-primary-hover: #0052a3;
 
   /* Feedback colors */
-  --color-correct: #2e7d32;
+  --color-correct: #59e820;
   --color-incorrect: #1c2d47;
 
   /* Borders */
@@ -77,6 +77,7 @@ a:focus-visible {
     --color-primary-hover: #80bfff;
 
     --color-correct: #66bb6a;
+    --color-incorrect: #1c2d47;
 
     --color-border: #444444;
   }
