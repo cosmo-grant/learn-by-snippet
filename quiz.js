@@ -122,25 +122,19 @@ class Quiz {
     // So the direct cause of behaviour is always clicks.
     // We need guards though, e.g. to prevent clicking disabled or hidden buttons.
     document.addEventListener("keydown", (event) => {
-      // Enter to finish, restart, or move to next question
+      // Enter or space to advance where possible (reveal answer, next question).
       // Use `else if` even when the conditions are statically incompatible to prevent races.
-      if (event.key === "Enter") {
-        if (
-          this.nextButton.hidden === false &&
-          this.nextButton.disabled === false
-        ) {
+      if (event.key === "Enter" || event.key === " ") {
+        if (!this.mainContent.hidden && !this.revealButton.disabled) {
+          event.preventDefault();
+          this.revealButton.click();
+        } else if (!this.mainContent.hidden && !this.nextButton.disabled) {
           event.preventDefault();
           this.nextButton.click();
         } else if (!this.finalScoreSection.hidden) {
           event.preventDefault();
           this.restartButton.click();
         }
-      }
-
-      // Space to toggle output and discussion.
-      if (event.key === " " && !this.mainContent.hidden) {
-        event.preventDefault();
-        this.revealButton.click();
       }
 
       // Arrow keys to move between viewable questions.
