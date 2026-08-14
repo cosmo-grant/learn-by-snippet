@@ -2,17 +2,16 @@ import asyncio
 
 
 async def foo():
-    raise Exception
+    print("in foo")
 
 
 async def bar():
-    await asyncio.sleep(3)
-    print("here")
+    print("in bar")
 
 
 async def main():
-    await asyncio.gather(foo(), bar())
-    print("done")
+    asyncio.create_task(foo())
+    await bar()
 
 
 asyncio.run(main())

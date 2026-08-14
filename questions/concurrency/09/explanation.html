@@ -1,9 +1,5 @@
 <p>
-  <code>threading.excepthook()</code> prints on stderr an exception raised by
-  <code>Thread.run()</code>.
+  <code>thread1.join()</code> blocks the main thread, not <code>thread2</code>.
 </p>
 
-<p>
-  But the exception doesn't propagate to the main thread, so
-  <code>here</code> is still printed and the exit code is 0.
-</p>
+<p>But they're still CPU-bound so the total time is unchanged.</p>

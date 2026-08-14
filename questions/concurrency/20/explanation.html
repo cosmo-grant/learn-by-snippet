@@ -1,1 +1,11 @@
-<p>Awaiting a task passes control to the event loop.</p>
+<p>
+  <code>asyncio.to_thread()</code> is useful for async-unaware IO-bound
+  functions.
+</p>
+
+<p>It runs the passed function in a separate thread, returning a coroutine.</p>
+
+<p>
+  <code>sleep()</code> releases the GIL so control can pass back to the main
+  thread.
+</p>

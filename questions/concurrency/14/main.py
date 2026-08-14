@@ -1,16 +1,12 @@
-import asyncio
-from time import sleep
+from multiprocessing import Process
 
 
-async def io_bound():
-    sleep(3)
-    print("done")
+def bad():
+    raise Exception
 
 
-async def main():
-    await io_bound()
-    await io_bound()
+if __name__ == "__main__":
+    proc = Process(target=bad)
+    proc.start()
+    proc.join()
     print("here")
-
-
-asyncio.run(main())

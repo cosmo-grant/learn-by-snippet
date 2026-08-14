@@ -1,16 +1,16 @@
-from multiprocessing import Process
-from time import sleep
+from threading import Thread
 
 
-def io_bound():
-    sleep(3)
+def cpu_bound():
+    # assume takes 3s of cpu
+    sum(range(2**25))
     print("done")
 
 
-if __name__ == "__main__":
-    # running on multicore machine
-    proc1 = Process(target=io_bound)
-    proc2 = Process(target=io_bound)
-    proc1.start()
-    proc2.start()
-    print("here")
+thread1 = Thread(target=cpu_bound)
+thread2 = Thread(target=cpu_bound)
+thread1.start()
+thread2.start()
+thread1.join()
+thread2.join()
+print("here")

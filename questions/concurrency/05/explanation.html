@@ -1,9 +1,8 @@
-<p>
-  The main thread runs when <code>thread1</code> and <code>thread2</code> are
-  paused.
-</p>
+<p>Speedup, despite the GIL!</p>
+
+<p>Interleaved, not parallel. But for IO-bound work, interleaving helps.</p>
 
 <p>
-  <code>thread1</code> and <code>thread2</code> are cpu-bound, so interleaving
-  doesn't help.
+  <code>thread1</code> and <code>thread2</code> don't <em>run</em> in parallel,
+  because of the GIL. But they can <em>wait</em> in parallel, so to speak.
 </p>

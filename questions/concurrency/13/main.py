@@ -1,16 +1,20 @@
-import asyncio
-from time import sleep
+from time import thread_time
+from multiprocessing import Process
 
 
-async def io_bound():
-    sleep(3)
+def cpu_bound():
+    start = thread_time()
+    while thread_time() - start < 3:
+        continue
     print("done")
 
 
-async def main():
-    io_bound()
-    io_bound()
+if __name__ == "__main__":
+    # running on multicore machine
+    proc1 = Process(target=cpu_bound)
+    proc2 = Process(target=cpu_bound)
+    proc1.start()
+    proc2.start()
+    proc1.join()
+    proc2.join()
     print("here")
-
-
-asyncio.run(main())

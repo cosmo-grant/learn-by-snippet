@@ -1,7 +1,9 @@
 // Generated automatically. Do not edit.
 
 const QUESTIONS_PER_QUIZ = {
+  
   concurrency: [
+    
     {
       preface: `<p>What does this output?</p>
 `,
@@ -24,9 +26,110 @@ here
 <p>Simple. Slow.</p>
 `,
     },
-
+    
     {
-      preface: `<p>Let's move the work into threads. Output?</p>
+      preface: `<p>Let's extract the work into a function. Output?</p>
+`,
+      code: `from time import sleep
+
+
+def io_bound():
+    sleep(3)
+    print("done")
+
+
+io_bound()
+io_bound()
+print("here")
+`,
+      output: `<~3s>
+done
+<~3s>
+done
+here
+`,
+      explanation: `<p>No different of course.</p>
+`,
+    },
+    
+    {
+      preface: `<p>What if the work is CPU-bound?</p>
+`,
+      code: `from time import thread_time
+
+
+def cpu_bound():
+    start = thread_time()
+    while thread_time() - start < 3:
+        continue
+    print("done")
+
+
+cpu_bound()
+cpu_bound()
+print("here")
+`,
+      output: `<~3s>
+done
+<~3s>
+done
+here
+`,
+      explanation: `<p>Again, no different.</p>
+
+<p>
+  (The busyloop is a placeholder: think of it as anything which needs 3s of
+  CPU.)
+</p>
+`,
+    },
+    
+    {
+      preface: `<p>Time for some concurrency. Let's move the work into threads.</p>
+`,
+      code: `from threading import Thread
+from time import thread_time
+
+
+def cpu_bound():
+    start = thread_time()
+    while thread_time() - start < 3:
+        continue
+    print("done")
+
+
+thread1 = Thread(target=cpu_bound)
+thread2 = Thread(target=cpu_bound)
+thread1.start()
+thread2.start()
+print("here")
+`,
+      output: `here
+<~6s>
+done
+done
+`,
+      explanation: `<p>
+  Three threads are in play: the main thread, <code>thread1</code>,
+  <code>thread2</code>.
+</p>
+
+<p>A thread runs only when it holds the Global Interpreter Lock.</p>
+
+<p>
+  The running thread is paused frequently and a ready thread gets the GIL and
+  runs. <em>Interleaved, not parallel.</em>
+</p>
+
+<p>
+  The main thread prints almost immediately. The others continue interleaving,
+  so take ~3s of CPU but ~6s of wall-clock.
+</p>
+`,
+    },
+    
+    {
+      preface: `<p>What if the work is IO-bound instead?</p>
 `,
       code: `from threading import Thread
 from time import sleep
@@ -48,20 +151,17 @@ print("here")
 done
 done
 `,
-      explanation: `<p>A thread runs only when it holds the Global Interpreter Lock.</p>
+      explanation: `<p>Speedup, despite the GIL!</p>
+
+<p>Interleaved, not parallel. But for IO-bound work, interleaving helps.</p>
 
 <p>
-  The running thread is paused regularly, or when it makes a syscall, and a
-  ready thread gets the GIL and runs. Interleaved, not parallel.
-</p>
-
-<p>
-  So: when <code>thread1</code> and <code>thread2</code> sleep, the main thread
-  runs.
+  <code>thread1</code> and <code>thread2</code> don't <em>run</em> in parallel,
+  because of the GIL. But they can <em>wait</em> in parallel, so to speak.
 </p>
 `,
     },
-
+    
     {
       preface: `<p>What if we <code>join()</code> them?</p>
 `,
@@ -91,9 +191,41 @@ here
       explanation: `<p><code>join()</code> blocks until the receiver completes.</p>
 `,
     },
-
+    
     {
-      preface: `<p>Does re-ordering make a difference?</p>
+      preface: `<p>Any difference if they're CPU-bound?</p>
+`,
+      code: `from threading import Thread
+from time import thread_time
+
+
+def cpu_bound():
+    start = thread_time()
+    while thread_time() - start < 3:
+        continue
+    print("done")
+
+
+thread1 = Thread(target=cpu_bound)
+thread2 = Thread(target=cpu_bound)
+thread1.start()
+thread1.join()
+thread2.start()
+thread2.join()
+print("here")
+`,
+      output: `<~3s>
+done
+<~3s>
+done
+here
+`,
+      explanation: `<p>No. To repeat: <code>join()</code> blocks until the receiver completes.</p>
+`,
+    },
+    
+    {
+      preface: `<p>Back to IO-bound. What if we re-order?</p>
 `,
       code: `from threading import Thread
 from time import sleep
@@ -123,86 +255,23 @@ here
 </p>
 
 <p>
-  <code>thread1</code> and <code>thread2</code> are io-bound, so interleaving
+  <code>thread1</code> and <code>thread2</code> are IO-bound, so interleaving
   helps.
 </p>
 `,
     },
-
+    
     {
-      preface: `<p>How about cpu-bound threads?</p>
+      preface: `<p>And for completeness, back to CPU-bound again.</p>
 `,
       code: `from threading import Thread
+from time import thread_time
 
 
 def cpu_bound():
-    # assume the sum takes 3s of cpu
-    sum(i**2 for i in range(2**25))
-    print("done")
-
-
-thread1 = Thread(target=cpu_bound)
-thread2 = Thread(target=cpu_bound)
-thread1.start()
-thread2.start()
-print("here")
-`,
-      output: `here
-<~6s>
-done
-done
-`,
-      explanation: `<p>
-  The main thread runs when <code>thread1</code> and <code>thread2</code> are
-  paused.
-</p>
-
-<p>
-  <code>thread1</code> and <code>thread2</code> are cpu-bound, so interleaving
-  doesn't help.
-</p>
-`,
-    },
-
-    {
-      preface: `<p>Ok, let's <code>join()</code> again.</p>
-`,
-      code: `from threading import Thread
-
-
-def cpu_bound():
-    # assume the sum takes 3s of cpu
-    sum(i**2 for i in range(2**25))
-    print("done")
-
-
-thread1 = Thread(target=cpu_bound)
-thread2 = Thread(target=cpu_bound)
-thread1.start()
-thread1.join()
-thread2.start()
-thread2.join()
-print("here")
-`,
-      output: `<~3s>
-done
-<~3s>
-done
-here
-`,
-      explanation: `<p>Same as before: <code>join()</code> blocks until the receiver completes.</p>
-`,
-    },
-
-    {
-      preface: `<p>Does re-ordering make a difference?</p>
-`,
-      code: `from threading import Thread
-
-
-def cpu_bound():
-    # assume the sum takes 3s of cpu
-    sum(i**2 for i in range(2**25))
+    start = thread_time()
+    while thread_time() - start < 3:
+        continue
     print("done")
 
 
@@ -223,18 +292,18 @@ here
   <code>thread1.join()</code> blocks the main thread, not <code>thread2</code>.
 </p>
 
-<p>But they're still cpu-bound so the total time is unchanged.</p>
+<p>But they're still CPU-bound so the total time is unchanged.</p>
 `,
     },
-
+    
     {
-      preface: `<p>Same as the previous question, no?</p>
+      preface: `<p>Swapping busyloop for busysum surely makes no difference, right?</p>
 `,
       code: `from threading import Thread
 
 
 def cpu_bound():
-    # assume the sum takes 3s of cpu
+    # assume takes 3s of cpu
     sum(range(2**25))
     print("done")
 
@@ -253,13 +322,17 @@ done
 done
 here
 `,
-      explanation: `<p>
+      explanation: `<p>Beware!</p>
+
+<p>
   The interpreter doesn't pause a thread while it's running native code, like
-  <code>sum()</code> does.
+  this <code>sum()</code> does.
 </p>
+
+<p>Exercise: try <code>sum(i for i in range(2**25))</code>.</p>
 `,
     },
-
+    
     {
       preface: `<p>What if threads go bad?</p>
 `,
@@ -292,7 +365,7 @@ here
 </p>
 `,
     },
-
+    
     {
       preface: `<p>Let's swap threads for processes.</p>
 `,
@@ -306,7 +379,7 @@ def io_bound():
 
 
 if __name__ == "__main__":
-    # running on multicore machine
+    # assume multicore machine
     proc1 = Process(target=io_bound)
     proc2 = Process(target=io_bound)
     proc1.start()
@@ -322,19 +395,24 @@ done
 
 <p>So they <em>can</em> run in parallel.</p>
 
-<p>But for io-bound work threads might be the better choice.</p>
+<p>
+  But for IO-bound work threads might be the better choice, because lower
+  overhead.
+</p>
 `,
     },
-
+    
     {
-      preface: `<p>What about cpu-bound work?</p>
+      preface: `<p>And for CPU-bound work?</p>
 `,
-      code: `from multiprocessing import Process
+      code: `from time import thread_time
+from multiprocessing import Process
 
 
 def cpu_bound():
-    # assume the sum takes 3s of cpu
-    sum(i**2 for i in range(2**25))
+    start = thread_time()
+    while thread_time() - start < 3:
+        continue
     print("done")
 
 
@@ -354,12 +432,12 @@ done
 here
 `,
       explanation: `<p>
-  <code>thread1</code> and <code>thread2</code> are cpu-bound, so running in
+  <code>thread1</code> and <code>thread2</code> are CPU-bound, so running in
   parallel helps.
 </p>
 `,
     },
-
+    
     {
       preface: `<p>What if processes go bad?</p>
 `,
@@ -388,7 +466,7 @@ here
 </p>
 `,
     },
-
+    
     {
       preface: `<p>A third approach: <code>asyncio</code>.</p>
 `,
@@ -419,7 +497,7 @@ asyncio.run(main())
 <p>Just creating a coroutine doens't schedule it on the event loop.</p>
 `,
     },
-
+    
     {
       preface: `<p>Ok, so let's <code>await</code>.</p>
 `,
@@ -451,7 +529,7 @@ here
 <p>No speedup yet.</p>
 `,
     },
-
+    
     {
       preface: `<p>We need async-aware functions, like <code>asyncio.sleep()</code>, right?</p>
 `,
@@ -483,7 +561,7 @@ done
 </p>
 `,
     },
-
+    
     {
       preface: `<p>What if we <code>gather()</code> them instead?</p>
 `,
@@ -517,7 +595,7 @@ here
 </p>
 `,
     },
-
+    
     {
       preface: `<p>
   What if we <code>gather()</code> <em>and</em> <code>asyncio.sleep()</code>?
@@ -546,7 +624,7 @@ here
       explanation: `<p>Speedup at last!</p>
 `,
     },
-
+    
     {
       preface: `<p>Remember threads?</p>
 `,
@@ -575,7 +653,7 @@ done
 here
 `,
       explanation: `<p>
-  <code>asyncio.to_thread()</code> is useful for async-unaware io-bound
+  <code>asyncio.to_thread()</code> is useful for async-unaware IO-bound
   functions.
 </p>
 
@@ -587,7 +665,7 @@ here
 </p>
 `,
     },
-
+    
     {
       preface: `<p>Know the differences between coroutines and tasks?</p>
 `,
@@ -613,7 +691,7 @@ in foo
 <p>But the main coroutine keeps control.</p>
 `,
     },
-
+    
     {
       preface: `<p>How about this?</p>
 `,
@@ -637,7 +715,7 @@ in main
       explanation: `<p>Awaiting a task passes control to the event loop.</p>
 `,
     },
-
+    
     {
       preface: `<p>And this?</p>
 `,
@@ -665,7 +743,7 @@ in foo
       explanation: `<p>Awaiting a coroutine doesn't pass control to the event loop.</p>
 `,
     },
-
+    
     {
       preface: `<p>Last one on this theme.</p>
 `,
@@ -693,7 +771,7 @@ in bar
       explanation: `<p>Awaiting a task passes control to the event loop.</p>
 `,
     },
-
+    
     {
       preface: `<p>What if awaitables go bad?</p>
 `,
@@ -730,9 +808,11 @@ Exception
 </p>
 `,
     },
+    
   ],
-
+  
   sockets: [
+    
     {
       preface: `<p>What does this output?</p>
 `,
@@ -758,7 +838,7 @@ print(conn.recv(1))
       explanation: `<p>A minimal example of socket communication.</p>
 `,
     },
-
+    
     {
       preface: `<p>How about this?</p>
 `,
@@ -781,7 +861,7 @@ print(conn.recv(1))
       explanation: `<p>As before, but taking advantage of convenience functions.</p>
 `,
     },
-
+    
     {
       preface: `<p>Let's dig deeper. Output?</p>
 `,
@@ -812,7 +892,7 @@ socket
 <p>But they're all just sockets.</p>
 `,
     },
-
+    
     {
       preface: `<p><code>accept()</code> returns a new local socket, but at what address?</p>
 `,
@@ -834,7 +914,7 @@ print(conn.getsockname())
       explanation: `<p>New socket. Same address.</p>
 `,
     },
-
+    
     {
       preface: `<p>How far can you get without a peer?</p>
 `,
@@ -862,9 +942,9 @@ sent
 </p>
 `,
     },
-
+    
     {
-      preface: `<p>How do <code>recv()</code> work?</p>
+      preface: `<p>How does <code>recv()</code> work?</p>
 `,
       code: `import socket
 from threading import Thread
@@ -890,7 +970,7 @@ b''
 </p>
 `,
     },
-
+    
     {
       preface: `<p>What if there's nothing to receive yet?</p>
 `,
@@ -921,7 +1001,7 @@ b'x'
 </p>
 `,
     },
-
+    
     {
       preface: `<p>Double trouble.</p>
 `,
@@ -952,7 +1032,7 @@ b'x'
 </p>
 `,
     },
-
+    
     {
       preface: `<p>What if no one comes to the party?</p>
 `,
@@ -972,7 +1052,7 @@ print(conn)
 </p>
 `,
     },
-
+    
     {
       preface: `<p>If it doesn't block, what <em>does</em> it do?</p>
 `,
@@ -993,7 +1073,7 @@ BlockingIOError: [Errno NN] Resource temporarily unavailable
 </p>
 `,
     },
-
+    
     {
       preface: ``,
       code: `import socket
@@ -1032,7 +1112,7 @@ OSError: [Errno NN] Address already in use
 </p>
 `,
     },
-
+    
     {
       preface: ``,
       code: `import socket
@@ -1055,7 +1135,7 @@ print(conn.recv(1))
       explanation: `<p><code>srv</code> spun off <code>conn</code>, but they're independent.</p>
 `,
     },
-
+    
     {
       preface: `<p>What if we <code>listen()</code> without a <code>bind()</code>?</p>
 `,
@@ -1074,5 +1154,7 @@ print(ip)
 </p>
 `,
     },
+    
   ],
+  
 };

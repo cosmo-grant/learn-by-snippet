@@ -1,2 +1,2 @@
 in foo
-in bar
+in main

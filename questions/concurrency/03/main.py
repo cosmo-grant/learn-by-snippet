@@ -1,16 +1,13 @@
-from threading import Thread
-from time import sleep
+from time import thread_time
 
 
-def io_bound():
-    sleep(3)
+def cpu_bound():
+    start = thread_time()
+    while thread_time() - start < 3:
+        continue
     print("done")
 
 
-thread1 = Thread(target=io_bound)
-thread2 = Thread(target=io_bound)
-thread1.start()
-thread1.join()
-thread2.start()
-thread2.join()
+cpu_bound()
+cpu_bound()
 print("here")

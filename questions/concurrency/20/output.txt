@@ -1,2 +1,4 @@
-in foo
-in main
+<~3s>
+done
+done
+here

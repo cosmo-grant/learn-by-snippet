@@ -1,4 +1,8 @@
+<p>Process objects run in separate processes, each with their own GIL.</p>
+
+<p>So they <em>can</em> run in parallel.</p>
+
 <p>
-  Same story as for threads: the exception is printed on stderr but doesn't
-  propagate to the main process.
+  But for IO-bound work threads might be the better choice, because lower
+  overhead.
 </p>

@@ -1,5 +1,8 @@
-<p>Process objects run in separate processes, each with their own GIL.</p>
+<p>Beware!</p>
 
-<p>So they <em>can</em> run in parallel.</p>
+<p>
+  The interpreter doesn't pause a thread while it's running native code, like
+  this <code>sum()</code> does.
+</p>
 
-<p>But for io-bound work threads might be the better choice.</p>
+<p>Exercise: try <code>sum(i for i in range(2**25))</code>.</p>
