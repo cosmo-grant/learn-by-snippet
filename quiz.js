@@ -12,6 +12,7 @@ class Quiz {
       this.savedQuestionDialog.textContent = savedState.currentQuestion + 1;
       this.totalQuestionsDialog.textContent =
         QUESTIONS_PER_QUIZ[savedState.title].length;
+      this.hasRevealedAnswer = savedState.hasRevealedAnswer;
 
       this.continueFromSavedButton.addEventListener("click", () => {
         this.currentQuiz = savedState.title;
@@ -183,6 +184,7 @@ class Quiz {
 
     this.revealButton.addEventListener("click", () => {
       this.hasRevealedAnswer = true;
+      this.saveState();
 
       this.outputPre.hidden = false;
       this.explanation.hidden = false;
@@ -210,7 +212,6 @@ class Quiz {
   }
 
   startQuiz() {
-    this.hasRevealedAnswer = false;
     this.populateNavBar();
     this.navButtons.forEach((button, index) =>
       button.addEventListener("click", () => this.loadQuestion(index)),
@@ -243,6 +244,7 @@ class Quiz {
     // Make it as though coming to the site for the very first time.
     this.clearState();
     this.currentQuestion = 0;
+    this.hasRevealedAnswer = false;
     this.showSplashScreen();
   }
 
@@ -395,6 +397,7 @@ class Quiz {
       title: this.currentQuiz,
       currentQuestion: this.currentQuestion,
       grades: this.grades,
+      hasRevealedAnswer: this.hasRevealedAnswer,
     };
     localStorage.setItem("python-by-quiz", JSON.stringify(state));
   }
