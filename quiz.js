@@ -58,9 +58,7 @@ class Quiz {
     this.continueFromSavedButton = document.getElementById(
       "continue-from-saved-button",
     );
-    this.newQuizButton = document.getElementById(
-      "new-quiz-button",
-    );
+    this.newQuizButton = document.getElementById("new-quiz-button");
   }
 
   populateNavBar() {
@@ -406,6 +404,7 @@ class Quiz {
     try {
       const savedState = localStorage.getItem("python-by-quiz");
       if (savedState) {
+        // TODO: add some check here that the quiz questions haven't changed in the meantime?
         return JSON.parse(savedState);
       }
     } catch (e) {

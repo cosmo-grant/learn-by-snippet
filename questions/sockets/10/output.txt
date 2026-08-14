@@ -1,3 +1,3 @@
 Traceback (most recent call last):
   ...
-BlockingIOError: [Errno NN] Resource temporarily unavailable
+BlockingIOError: [Errno 11] Resource temporarily unavailable
