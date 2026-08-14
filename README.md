@@ -22,7 +22,6 @@ And no one wants 50 question quizzes.
 ## Did you use LLMs?
 
 For styling, yes.
-Chunkier transcripts in `transcripts/`.
 I wrote everything else, following the example of [fstrings-wtf](https://github.com/mitsuhiko/fstrings-wtf/).
 
 ## Don't the timings in some outputs depend on the machine?
