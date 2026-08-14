@@ -125,7 +125,10 @@ class Quiz {
       // Enter to finish, restart, or move to next question
       // Use `else if` even when the conditions are statically incompatible to prevent races.
       if (event.key === "Enter") {
-        if (this.nextButton.hidden === false && this.nextButton.disabled === false) {
+        if (
+          this.nextButton.hidden === false &&
+          this.nextButton.disabled === false
+        ) {
           event.preventDefault();
           this.nextButton.click();
         } else if (!this.finalScoreSection.hidden) {
@@ -263,7 +266,8 @@ class Quiz {
     this.outputSamp.textContent = question.output;
     this.explanation.innerHTML = question.explanation;
 
-    this.nextButton.textContent = (index === this.questions.length - 1) ? ">>" : ">"
+    this.nextButton.textContent =
+      index === this.questions.length - 1 ? ">>" : ">";
 
     // Update grading button classes.
     // Maybe we'll hide the buttons but clearest to reset the classes in any case.
@@ -294,10 +298,7 @@ class Quiz {
       this.correctButton.disabled = true;
       this.incorrectButton.disabled = true;
       this.nextButton.disabled = true;
-    } else if (
-      index === this.currentQuestion &&
-      !this.hasRevealedAnswer
-    ) {
+    } else if (index === this.currentQuestion && !this.hasRevealedAnswer) {
       // not yet revealed answer to the current question
       this.outputPre.hidden = true;
       this.explanation.hidden = true;
