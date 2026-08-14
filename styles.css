@@ -284,8 +284,6 @@ pre {
   border: none;
   color: var(--color-primary);
   cursor: pointer;
-  /* text-decoration: underline; */
-  text-underline-offset: 0.2em;
 }
 
 #reveal-button:hover {

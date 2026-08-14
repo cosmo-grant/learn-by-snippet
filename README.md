@@ -1,6 +1,6 @@
 # README
 
-https://cosmo-grant.github.io/python-by-quiz/
+[cosmo-grant.github.io/python-by-quiz](https://cosmo-grant.github.io/python-by-quiz/)
 
 ## What is this?
 
@@ -21,8 +21,10 @@ And no one wants 50 question quizzes.
 
 ## Did you use LLMs?
 
-For styling, yes.
-I wrote everything else, following the example of [fstrings-wtf](https://github.com/mitsuhiko/fstrings-wtf/).
+For styling, yes, plus small tasks here and there.
+I wrote everything else, for better or worse, including all questions and explanations.
+I originally followed the example of [fstrings-wtf](https://github.com/mitsuhiko/fstrings-wtf/),
+though I've deviated a bit since.
 
 ## Don't the timings in some outputs depend on the machine?
 
@@ -39,7 +41,7 @@ I checked the snippets on a MacBook Pro M3.
 
 ## How did you check the snippets?
 
-Using [snippet-checker](https://github.com/cosmo-grant/snippet-checker).
+[pypi.org/project/snippet-checker/](https://pypi.org/project/snippet-checker/)
 
 ## Found a bug?
 
