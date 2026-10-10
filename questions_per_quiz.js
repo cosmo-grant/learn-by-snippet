@@ -1195,4 +1195,417 @@ print(ip)
     
   ],
   
+  unix_system_calls: [
+    
+    {
+      preface: ``,
+      code: `#include <fcntl.h>
+#include <stdio.h>
+#include <unistd.h>
+
+int main(int argc, char *argv[]) {
+  int x;
+  close(0);
+  x = open(argv[0], O_RDONLY);
+  printf("%d\n", x);
+}
+`,
+      output: ``,
+      explanation: `<p><code>open()</code> returns the least available file descriptor.</p>
+`,
+      highlightjsAlias: `c`,
+    },
+    
+    {
+      preface: ``,
+      code: `#include <stdio.h>
+#include <sys/wait.h>
+#include <unistd.h>
+
+int main(int argc, char *argv[]) {
+  int x;
+  char buf[] = "x\n";
+  x = dup(1);
+  printf("%d\n", x);
+  write(x, &buf, 2);
+}
+`,
+      output: ``,
+      explanation: `<p>
+  <code>dup(fd)</code> returns a new file descriptor referring to the same file
+  as <code>fd</code>.
+</p>
+`,
+      highlightjsAlias: `c`,
+    },
+    
+    {
+      preface: ``,
+      code: `#include <fcntl.h>
+#include <unistd.h>
+
+int main(int argc, char *argv[]) {
+  if (argc == 1) {
+    dup(1);
+    execl(argv[0], argv[0], "extra", (char *)NULL);
+  } else {
+    write(3, "x\n", 2);
+  }
+}
+`,
+      output: ``,
+      explanation: `<p><code>exec()</code> preserves the file descriptor table.</p>
+`,
+      highlightjsAlias: `c`,
+    },
+    
+    {
+      preface: ``,
+      code: `#include <fcntl.h>
+#include <unistd.h>
+
+int main(int argc, char *argv[]) {
+  int fd = dup(1);
+  if (fork() == 0) {
+    write(fd, "x\n", 2);
+  }
+}
+`,
+      output: ``,
+      explanation: `<p><code>fork()</code> copies the parent's file descriptor table.</p>
+`,
+      highlightjsAlias: `c`,
+    },
+    
+    {
+      preface: ``,
+      code: `#include <fcntl.h>
+#include <sys/wait.h>
+#include <unistd.h>
+
+int main(int argc, char *argv[]) {
+  if (fork() == 0) {
+    close(1);
+  } else {
+    wait(0);
+    write(1, "x\n", 2);
+  }
+}
+`,
+      output: ``,
+      explanation: `<p><code>fork()</code> <em>copies</em> the parent's file descriptor table.</p>
+
+<p>So, for example, the parent doesn't see the child's changes.</p>
+`,
+      highlightjsAlias: `c`,
+    },
+    
+    {
+      preface: ``,
+      code: `#include <fcntl.h>
+#include <stdio.h>
+#include <unistd.h>
+
+int main(int argc, char *argv[]) {
+  int x;
+  x = open(argv[0], O_RDONLY);
+  printf("%d\n", x);
+}
+`,
+      output: ``,
+      explanation: `<p><code>open()</code> returns the least available file descriptor.</p>
+`,
+      highlightjsAlias: `c`,
+    },
+    
+    {
+      preface: ``,
+      code: `#include <stdio.h>
+#include <unistd.h>
+
+int main(int argc, char *argv[]) {
+  int p[2];
+  pipe(p);
+  printf("%d %d\n", p[0], p[1]);
+}
+`,
+      output: ``,
+      explanation: `<p>
+  <code>pipe()</code> creates a small kernel buffer, exposing it to the process
+  as two file descriptors.
+</p>
+`,
+      highlightjsAlias: `c`,
+    },
+    
+    {
+      preface: ``,
+      code: `#include <unistd.h>
+
+int main(int argc, char *argv[]) {
+  int p[2];
+  char buf[1];
+  pipe(p);
+  if (fork() == 0) {
+    sleep(1);
+    write(p[1], "x", 1);
+  } else {
+    read(p[0], buf, 1);
+    write(1, buf, 1);
+  }
+}
+`,
+      output: ``,
+      explanation: `<p>
+  Reads on a <code>pipe()</code> block until data is available or all write-side
+  file descriptors are closed.
+</p>
+
+<p>Data is available here.</p>
+`,
+      highlightjsAlias: `c`,
+    },
+    
+    {
+      preface: ``,
+      code: `#include <unistd.h>
+
+int main(int argc, char *argv[]) {
+  int p[2];
+  char buf[1];
+  pipe(p);
+  if (fork() == 0) {
+    sleep(1);
+    close(p[1]);
+  } else {
+    read(p[0], buf, 1);
+  }
+}
+`,
+      output: ``,
+      explanation: `<p>
+  Reads on a <code>pipe()</code> block until data is available or all write-side
+  file descriptors are closed.
+</p>
+
+<p><code>fork()</code> copies the file descriptor table.</p>
+
+<p>The child closes its fd pointing at the pipe's write-end.</p>
+
+<p>But the parent doesn't, so it still hangs.</p>
+`,
+      highlightjsAlias: `c`,
+    },
+    
+    {
+      preface: ``,
+      code: `#include <unistd.h>
+
+int main(int argc, char *argv[]) {
+  int p[2];
+  char buf[1];
+  pipe(p);
+  if (fork() == 0) {
+    sleep(1);
+    close(p[1]);
+  } else {
+    close(p[1]);
+    read(p[0], buf, 1);
+  }
+}
+`,
+      output: ``,
+      explanation: `<p>
+  Reads on a <code>pipe()</code> block until data is available or all write-side
+  file descriptors are closed.
+</p>
+
+<p><code>fork()</code> copies the file descriptor table.</p>
+
+<p>Both parent and child close their fds pointing at the pipe's write-end.</p>
+
+<p>So all good.</p>
+`,
+      highlightjsAlias: `c`,
+    },
+    
+    {
+      preface: ``,
+      code: `#include <unistd.h>
+
+int main(int argc, char *argv[]) {
+  int p[2];
+  char buf[1];
+  pipe(p);
+  read(p[0], buf, 1);
+}
+`,
+      output: ``,
+      explanation: `<p>
+  Reads on a <code>pipe()</code> block until data is available or all write-side
+  file descriptors are closed.
+</p>
+
+<p>Neither happens here, so it hangs.</p>
+`,
+      highlightjsAlias: `c`,
+    },
+    
+    {
+      preface: ``,
+      code: `#include <fcntl.h>
+#include <unistd.h>
+
+int main(int argc, char *argv[]) {
+  int fd1 = open("testfile", O_CREAT | O_RDWR, 0644);
+  int fd2 = open("testfile", O_RDWR);
+  write(fd1, "ab", 1);
+  char buf[1];
+  read(fd2, buf, 1);
+  write(1, buf, 1);
+}
+`,
+      output: ``,
+      explanation: `<p>
+  Separate calls to <code>open()</code> on the same file get independent
+  offsets.
+</p>
+`,
+      highlightjsAlias: `c`,
+    },
+    
+    {
+      preface: ``,
+      code: `#include <stdio.h>
+#include <stdlib.h>
+
+char **split_line(char *line) {
+  int line_idx, words_idx;
+  char *word_start;
+  char **words = malloc(10 * sizeof(char *));
+
+  words_idx = 0;
+  word_start = line;
+  for (line_idx = 0;; line_idx++) {
+    if (*(line + line_idx) == ' ' || *(line + line_idx) == '\0') {
+      *(line + line_idx) = '\0';
+      words[words_idx] = word_start;
+      word_start = line + line_idx + 1;
+      words_idx++;
+    }
+    if (*(line + line_idx) == '\0') {
+      break;
+    }
+  }
+
+  return words;
+}
+
+int main(int argc, char **argv) {
+  char **words;
+  char line[] = "foo bar\n";
+  words = split_line(line);
+  printf("%s", *words);
+}
+`,
+      output: ``,
+      explanation: `<p>
+  <code>split_line()</code> splits a line into words on space, returning an
+  array of words.
+</p>
+
+<p>
+  When it hits the end of a word, it writes a null terminator so the word can be
+  used as its own string.
+</p>
+`,
+      highlightjsAlias: `c`,
+    },
+    
+    {
+      preface: ``,
+      code: `#include <stdio.h>
+#include <sys/wait.h>
+#include <unistd.h>
+
+int main(int argc, char *argv[]) {
+  int x;
+  if (fork() > 0) {
+    wait(&x);
+    printf("%d\n", x);
+  }
+}
+`,
+      output: ``,
+      explanation: `<p><code>wait()</code> puts the child's exit status in the given address.</p>
+`,
+      highlightjsAlias: `c`,
+    },
+    
+    {
+      preface: ``,
+      code: `#include <stdio.h>
+#include <sys/wait.h>
+#include <unistd.h>
+
+int main(int argc, char *argv[]) {
+  if (fork() > 0) {
+    if (fork() > 0) {
+      wait(0);
+      printf("here\n");
+    } else {
+      sleep(1);
+    }
+  } else {
+    sleep(2);
+  }
+}
+`,
+      output: ``,
+      explanation: `<p><code>wait()</code> waits until <em>some</em> child exits.</p>
+`,
+      highlightjsAlias: `c`,
+    },
+    
+    {
+      preface: ``,
+      code: `#include <stdio.h>
+#include <sys/wait.h>
+#include <unistd.h>
+
+int main(int argc, char *argv[]) {
+  int x;
+  x = wait(0);
+  printf("%d\n", x);
+}
+`,
+      output: ``,
+      explanation: `<p><code>wait()</code> returns -1 immediately if there are no children.</p>
+`,
+      highlightjsAlias: `c`,
+    },
+    
+    {
+      preface: ``,
+      code: `#include <stdio.h>
+#include <sys/wait.h>
+#include <unistd.h>
+
+int main(int argc, char *argv[]) {
+  if (fork() == 0) {
+    sleep(1);
+  } else {
+    wait(0);
+    printf("here\n");
+  }
+}
+`,
+      output: ``,
+      explanation: `<p><code>wait()</code> waits.</p>
+`,
+      highlightjsAlias: `c`,
+    },
+    
+  ],
+  
 };
