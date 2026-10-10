@@ -254,6 +254,7 @@ class Quiz {
     const question = this.questions[index];
     this.viewedQuestion = index;
     this.snippetCode.textContent = question.code;
+    this.snippetCode.classList.add(`lang-${question.highlightjsAlias}`);
     this.snippetCode.removeAttribute("data-highlighted"); // else highlightjs skips re-highlighting
     hljs.highlightElement(this.snippetCode);
     this.prefaceText.innerHTML = question.preface;

@@ -25,6 +25,7 @@ here
 
 <p>Simple. Slow.</p>
 `,
+      highlightjsAlias: `py`,
     },
     
     {
@@ -50,6 +51,7 @@ here
 `,
       explanation: `<p>No different of course.</p>
 `,
+      highlightjsAlias: `py`,
     },
     
     {
@@ -82,6 +84,7 @@ here
   CPU.)
 </p>
 `,
+      highlightjsAlias: `py`,
     },
     
     {
@@ -126,6 +129,7 @@ done
   so take ~3s of CPU but ~6s of wall-clock.
 </p>
 `,
+      highlightjsAlias: `py`,
     },
     
     {
@@ -160,6 +164,7 @@ done
   because of the GIL. But they can <em>wait</em> in parallel, so to speak.
 </p>
 `,
+      highlightjsAlias: `py`,
     },
     
     {
@@ -190,6 +195,7 @@ here
 `,
       explanation: `<p><code>join()</code> blocks until the receiver completes.</p>
 `,
+      highlightjsAlias: `py`,
     },
     
     {
@@ -222,6 +228,7 @@ here
 `,
       explanation: `<p>No. To repeat: <code>join()</code> blocks until the receiver completes.</p>
 `,
+      highlightjsAlias: `py`,
     },
     
     {
@@ -259,6 +266,7 @@ here
   helps.
 </p>
 `,
+      highlightjsAlias: `py`,
     },
     
     {
@@ -294,6 +302,7 @@ here
 
 <p>But they're still CPU-bound so the total time is unchanged.</p>
 `,
+      highlightjsAlias: `py`,
     },
     
     {
@@ -331,6 +340,7 @@ here
 
 <p>Exercise: try <code>sum(i for i in range(2**25))</code>.</p>
 `,
+      highlightjsAlias: `py`,
     },
     
     {
@@ -364,6 +374,7 @@ here
   <code>here</code> is still printed and the exit code is 0.
 </p>
 `,
+      highlightjsAlias: `py`,
     },
     
     {
@@ -400,6 +411,7 @@ done
   overhead.
 </p>
 `,
+      highlightjsAlias: `py`,
     },
     
     {
@@ -436,6 +448,7 @@ here
   parallel helps.
 </p>
 `,
+      highlightjsAlias: `py`,
     },
     
     {
@@ -465,6 +478,7 @@ here
   propagate to the main process.
 </p>
 `,
+      highlightjsAlias: `py`,
     },
     
     {
@@ -496,6 +510,7 @@ asyncio.run(main())
 
 <p>Just creating a coroutine doens't schedule it on the event loop.</p>
 `,
+      highlightjsAlias: `py`,
     },
     
     {
@@ -528,6 +543,7 @@ here
 
 <p>No speedup yet.</p>
 `,
+      highlightjsAlias: `py`,
     },
     
     {
@@ -560,6 +576,7 @@ done
   there's no other work scheduled at that point.
 </p>
 `,
+      highlightjsAlias: `py`,
     },
     
     {
@@ -594,6 +611,7 @@ here
   thread.
 </p>
 `,
+      highlightjsAlias: `py`,
     },
     
     {
@@ -623,6 +641,7 @@ here
 `,
       explanation: `<p>Speedup at last!</p>
 `,
+      highlightjsAlias: `py`,
     },
     
     {
@@ -664,6 +683,7 @@ here
   thread.
 </p>
 `,
+      highlightjsAlias: `py`,
     },
     
     {
@@ -690,6 +710,7 @@ in foo
 
 <p>But the main coroutine keeps control.</p>
 `,
+      highlightjsAlias: `py`,
     },
     
     {
@@ -714,6 +735,7 @@ in main
 `,
       explanation: `<p>Awaiting a task passes control to the event loop.</p>
 `,
+      highlightjsAlias: `py`,
     },
     
     {
@@ -742,6 +764,7 @@ in foo
 `,
       explanation: `<p>Awaiting a coroutine doesn't pass control to the event loop.</p>
 `,
+      highlightjsAlias: `py`,
     },
     
     {
@@ -770,6 +793,7 @@ in bar
 `,
       explanation: `<p>Awaiting a task passes control to the event loop.</p>
 `,
+      highlightjsAlias: `py`,
     },
     
     {
@@ -807,6 +831,7 @@ Exception
   <em>it</em> cancels any remaining awaitables.
 </p>
 `,
+      highlightjsAlias: `py`,
     },
     
   ],
@@ -837,6 +862,7 @@ print(conn.recv(1))
 `,
       explanation: `<p>A minimal example of socket communication.</p>
 `,
+      highlightjsAlias: `py`,
     },
     
     {
@@ -860,6 +886,7 @@ print(conn.recv(1))
 `,
       explanation: `<p>As before, but taking advantage of convenience functions.</p>
 `,
+      highlightjsAlias: `py`,
     },
     
     {
@@ -891,6 +918,7 @@ socket
 
 <p>But they're all just sockets.</p>
 `,
+      highlightjsAlias: `py`,
     },
     
     {
@@ -913,6 +941,7 @@ print(conn.getsockname())
 `,
       explanation: `<p>New socket. Same address.</p>
 `,
+      highlightjsAlias: `py`,
     },
     
     {
@@ -941,6 +970,7 @@ sent
   buffers, so the client can still connect and send.
 </p>
 `,
+      highlightjsAlias: `py`,
     },
     
     {
@@ -969,6 +999,7 @@ b''
   <code>recv()</code> returns empty when the peer has closed the connection.
 </p>
 `,
+      highlightjsAlias: `py`,
     },
     
     {
@@ -1000,6 +1031,7 @@ b'x'
   <code>n</code> bytes.
 </p>
 `,
+      highlightjsAlias: `py`,
     },
     
     {
@@ -1031,6 +1063,7 @@ b'x'
   up to <code>n</code> bytes.
 </p>
 `,
+      highlightjsAlias: `py`,
     },
     
     {
@@ -1051,6 +1084,7 @@ print(conn)
   available.
 </p>
 `,
+      highlightjsAlias: `py`,
     },
     
     {
@@ -1072,6 +1106,7 @@ BlockingIOError: [Errno NN] Resource temporarily unavailable
   immediately.
 </p>
 `,
+      highlightjsAlias: `py`,
     },
     
     {
@@ -1111,6 +1146,7 @@ OSError: [Errno NN] Address already in use
   <code>TIME_WAIT</code>s.
 </p>
 `,
+      highlightjsAlias: `py`,
     },
     
     {
@@ -1134,6 +1170,7 @@ print(conn.recv(1))
 `,
       explanation: `<p><code>srv</code> spun off <code>conn</code>, but they're independent.</p>
 `,
+      highlightjsAlias: `py`,
     },
     
     {
@@ -1153,6 +1190,7 @@ print(ip)
   host's IPs". The kernel chooses an ephemeral port.
 </p>
 `,
+      highlightjsAlias: `py`,
     },
     
   ],

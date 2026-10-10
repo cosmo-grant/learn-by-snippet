@@ -15,11 +15,15 @@ def get_quiz_questions(quiz):
     questions = []
 
     for dir in dirs:
-        code = (dir / "main.py").read_text()
+        mains = list((dir.glob("main.*")))
+        assert len(mains) == 1, f"Expected exactly one main.* file in {dir} but found {mains}"
+        main_ = mains[0]
+        code = (main_).read_text()
         output = (dir / "output.txt").read_text()
         explanation = (dir / "explanation.html").read_text()
         preface = (dir / "preface.html").read_text()
-        questions.append([preface, code, output, explanation])
+        highlightjs_alias = main_.suffix.removeprefix(".")  # https://github.com/highlightjs/highlight.js/blob/main/SUPPORTED_LANGUAGES.md
+        questions.append([preface, code, output, explanation, highlightjs_alias])
 
     return questions
 

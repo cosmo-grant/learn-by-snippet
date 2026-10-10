@@ -3,12 +3,13 @@
 const QUESTIONS_PER_QUIZ = {
   {% for title, questions in questions_per_quiz %}
   {{title}}: [
-    {% for preface, code, output, explanation in questions %}
+    {% for preface, code, output, explanation, highlightjs_alias in questions %}
     {
       preface: `{{preface}}`,
       code: `{{code}}`,
       output: `{{output}}`,
       explanation: `{{explanation}}`,
+      highlightjsAlias: `{{highlightjs_alias}}`,
     },
     {% endfor %}
   ],
