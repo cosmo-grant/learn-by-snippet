@@ -7,11 +7,19 @@ import json
 from pathlib import Path
 
 
-def get_quiz_questions(quiz):
-    dirs = [path for path in quiz.iterdir() if path.is_dir()]
-    dirs.sort()
-    questions = []
+def get_quiz_extension(quiz_dir):
+    extensions = {p.suffix for p in quiz_dir.glob("*/main.*")}
+    assert len(extensions) == 1, (
+        f"Expected all */main.* files to have same extension, but found: {extensions}"
+    )
+    return extensions.pop().removeprefix(".")
 
+
+def get_quiz_questions(quiz_dir):
+    dirs = [path for path in quiz_dir.iterdir() if path.is_dir()]
+    dirs.sort()
+
+    questions = []
     for dir in dirs:
         mains = list(dir.glob("main.*"))
         assert len(mains) == 1, (
@@ -37,7 +45,10 @@ def get_quiz_questions(quiz):
 def main() -> None:
     quiz_dirs = [path for path in Path("questions").iterdir() if path.is_dir()]
     questions_per_quiz = {
-        quiz_dir.name.replace("_", " "): get_quiz_questions(quiz_dir)
+        quiz_dir.name.replace("_", " "): {
+            "extension": get_quiz_extension(quiz_dir),
+            "questions": get_quiz_questions(quiz_dir),
+        }
         for quiz_dir in quiz_dirs
     }
 

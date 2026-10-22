@@ -11,14 +11,14 @@ class Quiz {
       this.savedTitleDialog.textContent = savedState.title;
       this.savedQuestionDialog.textContent = savedState.currentQuestion + 1;
       this.totalQuestionsDialog.textContent =
-        QUESTIONS_PER_QUIZ[savedState.title].length;
+        QUESTIONS_PER_QUIZ[savedState.title].questions.length;
       this.hasRevealedAnswer = savedState.hasRevealedAnswer;
 
       this.continueFromSavedButton.addEventListener("click", () => {
         this.currentQuiz = savedState.title;
         this.currentQuestion = savedState.currentQuestion;
         this.grades = savedState.grades;
-        this.questions = QUESTIONS_PER_QUIZ[this.currentQuiz];
+        this.questions = QUESTIONS_PER_QUIZ[this.currentQuiz].questions;
         this.startQuiz();
       });
     } else {
@@ -77,7 +77,12 @@ class Quiz {
   populateQuizChoices() {
     Object.keys(QUESTIONS_PER_QUIZ).forEach((title) => {
       const button = document.createElement("button");
-      button.textContent = title;
+      button.dataset.quiz = title;
+      const logo = document.createElement("img");
+      const extension = QUESTIONS_PER_QUIZ[title].extension;
+      logo.src = `logos/${extension}.svg`;
+      logo.alt = extension;
+      button.append(logo, " ", `${title}`);
       this.quizChoices.appendChild(button);
     });
     this.quizButtons = [...this.quizChoices.children];
@@ -172,8 +177,8 @@ class Quiz {
     this.quizButtons.forEach((button) => {
       button.addEventListener("click", () => {
         // Set quiz-specific state.
-        this.currentQuiz = button.textContent;
-        this.questions = QUESTIONS_PER_QUIZ[this.currentQuiz];
+        this.currentQuiz = button.dataset.quiz;
+        this.questions = QUESTIONS_PER_QUIZ[this.currentQuiz].questions;
         this.grades = Array(this.questions.length).fill(null);
 
         this.startQuiz();
