@@ -8,7 +8,7 @@ questions:
 	uv run ./make_questions.py
 
 view:
-	open https://cosmo-grant.github.io/python-by-quiz/
+	open https://cosmo-grant.github.io/learn-by-snippet/
 
 preview:
 	live-server

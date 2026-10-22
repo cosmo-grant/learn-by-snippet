@@ -1,6 +1,6 @@
 # README
 
-[cosmo-grant.github.io/python-by-quiz](https://cosmo-grant.github.io/python-by-quiz/)
+[cosmo-grant.github.io/learn-by-snippet](https://cosmo-grant.github.io/learn-by-snippet/)
 
 ## What is this?
 

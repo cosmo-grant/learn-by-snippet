@@ -398,12 +398,12 @@ class Quiz {
       grades: this.grades,
       hasRevealedAnswer: this.hasRevealedAnswer,
     };
-    localStorage.setItem("python-by-quiz", JSON.stringify(state));
+    localStorage.setItem("learn-by-snippet", JSON.stringify(state));
   }
 
   loadState() {
     try {
-      const savedState = localStorage.getItem("python-by-quiz");
+      const savedState = localStorage.getItem("learn-by-snippet");
       if (savedState) {
         // TODO: add some check here that the quiz questions haven't changed in the meantime?
         return JSON.parse(savedState);
@@ -415,7 +415,7 @@ class Quiz {
   }
 
   clearState() {
-    localStorage.removeItem("python-by-quiz");
+    localStorage.removeItem("learn-by-snippet");
   }
 }
 
