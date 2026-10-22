@@ -37,7 +37,8 @@ def get_quiz_questions(quiz):
 def main() -> None:
     quiz_dirs = [path for path in Path("questions").iterdir() if path.is_dir()]
     questions_per_quiz = {
-        quiz_dir.name: get_quiz_questions(quiz_dir) for quiz_dir in quiz_dirs
+        quiz_dir.name.replace("_", " "): get_quiz_questions(quiz_dir)
+        for quiz_dir in quiz_dirs
     }
 
     with open("questions_per_quiz.js", "w") as f:
