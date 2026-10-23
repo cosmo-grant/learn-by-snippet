@@ -54,4 +54,4 @@ Great! Please open an issue.
 
 ## Want more questions like these?
 
-You might like [my anki deck](https://ankiweb.net/shared/info/1924308445).
+You might like [my anki decks](https://ankiweb.net/shared/by-author/777251159).
