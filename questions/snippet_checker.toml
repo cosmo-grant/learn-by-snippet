@@ -3,6 +3,8 @@ timeout = 10
 
 [runner_images]
 py = "snip-python:3.14"
+c = "snip-gcc:16.2"
 
 [formatter_images]
 py = "snip-ruff:0.16"
+c = "snip-clang-format:19"
