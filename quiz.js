@@ -3,28 +3,7 @@ class Quiz {
     this.getElements();
     this.populateQuizChoices();
     this.setupEventListeners();
-
-    const savedState = this.loadState();
-    if (savedState) {
-      // Offer user choice to continue or start afresh.
-      this.showContinueDialog();
-      this.savedTitleDialog.textContent = savedState.title;
-      this.savedQuestionDialog.textContent = savedState.currentQuestion + 1;
-      this.totalQuestionsDialog.textContent =
-        QUESTIONS_PER_QUIZ[savedState.title].questions.length;
-      this.hasRevealedAnswer = savedState.hasRevealedAnswer;
-
-      this.continueFromSavedButton.addEventListener("click", () => {
-        this.currentQuiz = savedState.title;
-        this.currentQuestion = savedState.currentQuestion;
-        this.grades = savedState.grades;
-        this.questions = QUESTIONS_PER_QUIZ[this.currentQuiz].questions;
-        this.startQuiz();
-      });
-    } else {
-      // no saved state; fresh start
-      this.restart();
-    }
+    this.restartFromSplash();
   }
 
   getElements() {
@@ -58,7 +37,7 @@ class Quiz {
     this.continueFromSavedButton = document.getElementById(
       "continue-from-saved-button",
     );
-    this.newQuizButton = document.getElementById("new-quiz-button");
+    this.restartButton = document.getElementById("restart-button");
   }
 
   populateNavBar() {
@@ -176,12 +155,9 @@ class Quiz {
 
     this.quizButtons.forEach((button) => {
       button.addEventListener("click", () => {
-        // Set quiz-specific state.
         this.currentQuiz = button.dataset.quiz;
         this.questions = QUESTIONS_PER_QUIZ[this.currentQuiz].questions;
-        this.grades = Array(this.questions.length).fill(null);
-
-        this.startQuiz();
+        this.startOrContinueQuiz();
       });
     });
 
@@ -210,11 +186,47 @@ class Quiz {
         this.nextQuestion();
       }
     });
-    this.moreQuizzesButton.addEventListener("click", () => this.restart());
-    this.newQuizButton.addEventListener("click", () => this.restart());
+    this.moreQuizzesButton.addEventListener("click", () =>
+      this.restartFromSplash(),
+    );
+  }
+
+  startOrContinueQuiz() {
+    // Check if this quiz is in progress.
+    // We've already set this.currentQuiz and this.questions correctly.
+    const savedQuizState = this.loadState()?.[this.currentQuiz];
+    if (savedQuizState) {
+      // Offer user choice to continue or start afresh.
+      this.showContinueDialog();
+      this.savedTitleDialog.textContent = this.currentQuiz;
+      this.savedQuestionDialog.textContent = savedQuizState.currentQuestion + 1;
+      this.totalQuestionsDialog.textContent = this.questions.length;
+
+      this.continueFromSavedButton.addEventListener("click", () => {
+        this.currentQuestion = savedQuizState.currentQuestion;
+        this.grades = savedQuizState.grades;
+        this.hasRevealedAnswer = savedQuizState.hasRevealedAnswer;
+        this.startQuiz();
+      });
+
+      this.restartButton.addEventListener("click", () => {
+        this.clearState(this.currentQuiz);
+        this.currentQuestion = 0;
+        this.grades = Array(this.questions.length).fill(null);
+        this.hasRevealedAnswer = false;
+        this.startQuiz();
+      });
+    } else {
+      // No saved state for this quiz.
+      this.currentQuestion = 0;
+      this.grades = Array(this.questions.length).fill(null);
+      this.hasRevealedAnswer = false;
+      this.startQuiz();
+    }
   }
 
   startQuiz() {
+    // Assumes quiz state (current question etc.) has been initialized or loaded already.
     this.populateNavBar();
     this.navButtons.forEach((button, index) =>
       button.addEventListener("click", () => this.loadQuestion(index)),
@@ -243,9 +255,7 @@ class Quiz {
     return this.grades.filter(Boolean).length;
   }
 
-  restart() {
-    // Make it as though coming to the site for the very first time.
-    this.clearState();
+  restartFromSplash() {
     this.currentQuestion = 0;
     this.hasRevealedAnswer = false;
     this.showSplashScreen();
@@ -370,7 +380,7 @@ class Quiz {
   }
 
   finishQuiz() {
-    this.clearState();
+    this.clearState(this.currentQuiz);
     this.showFinalScoreSection();
     this.finalScoreValue.textContent = this.computeScore();
     this.finalScoreMax.textContent = this.questions.length;
@@ -393,17 +403,18 @@ class Quiz {
     this.finalScoreMessage.innerHTML = message;
   }
 
-  // There is at most one quiz in progress.
-  // The user can either continue that quiz or start completely afresh (which clears saved state).
+  // We save the user's progress, if any, on each quiz.
+  // When the user picks a quiz, if they've made progress on it,
+  // they can either continue or start afresh (which clears just that quiz's saved state).
   // saveState() should be called after any state-changing action.
   saveState() {
-    const state = {
-      title: this.currentQuiz,
+    let savedState = this.loadState() ?? {};
+    savedState[this.currentQuiz] = {
       currentQuestion: this.currentQuestion,
       grades: this.grades,
       hasRevealedAnswer: this.hasRevealedAnswer,
     };
-    localStorage.setItem("learn-by-snippet", JSON.stringify(state));
+    localStorage.setItem("learn-by-snippet", JSON.stringify(savedState));
   }
 
   loadState() {
@@ -419,8 +430,10 @@ class Quiz {
     return null;
   }
 
-  clearState() {
-    localStorage.removeItem("learn-by-snippet");
+  clearState(title) {
+    let savedState = this.loadState();
+    delete savedState[title];
+    localStorage.setItem("learn-by-snippet", JSON.stringify(savedState));
   }
 }
 
