@@ -52,6 +52,7 @@ def main() -> None:
         for quiz_dir in quiz_dirs
     }
 
+    # TODO: sort by extension, then title
     with open("questions_per_quiz.js", "w") as f:
         f.write(
             f"""\
