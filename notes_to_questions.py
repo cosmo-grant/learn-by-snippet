@@ -50,7 +50,10 @@ def markdown_output(output: str) -> str:
 
 def main() -> None:
     parser = ArgumentParser()
-    parser.add_argument("tag", help="Tag of 'Code output' notes to extract.")
+    parser.add_argument(
+        "query",
+        help="Anki query of target 'Code output' notes.",
+    )
     parser.add_argument(
         "dest", type=Path, help="Directory in which to write questions."
     )
@@ -65,14 +68,9 @@ def main() -> None:
         raise RuntimeError("Unsupported platform")
 
     collection = Collection(str(path))
-    note_ids = collection.find_notes("")
-    notes = [collection.get_note(id) for id in note_ids]
-    target_notes = [
-        note
-        for note in notes
-        if args.tag in note.tags and note.note_type()["name"] == "Code output"  # ty:ignore[not-subscriptable]
-    ]
-    print(f"Found {len(target_notes)} target notes.")
+    note_ids = collection.find_notes(args.query)
+    target_notes = [collection.get_note(id) for id in note_ids]
+    print(f"Found {len(target_notes)} target 'Code output' notes.")
 
     args.dest.mkdir()
 
