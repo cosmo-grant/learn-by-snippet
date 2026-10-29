@@ -259,7 +259,7 @@ const QUESTIONS_PER_QUIZ = {
         "highlightjsAlias": "py"
       },
       {
-        "code": "import socket\nfrom threading import Thread\n\n\ndef client():\n    sock = socket.create_connection((\"127.0.0.1\", 44444))\n    sock.send(b\"x\")\n\n\nsrv1 = socket.create_connection((\"127.0.0.1\", 44444))\nThread(target=client).start()\nconn, _ = srv1.accept()\nprint(conn.recv(1))\nconn.close()\nsrv1.close()\n\nsrv2 = socket.create_connection((\"127.0.0.1\", 44444))\nThread(target=client).start()\nprint(conn.recv(1))\nconn.close()\nsrv1.close()\n",
+        "code": "import socket\nfrom threading import Thread\n\n\ndef client():\n    sock = socket.create_connection((\"127.0.0.1\", 44444))\n    sock.send(b\"x\")\n\n\nsrv1 = socket.socket()\nsrv1.bind((\"127.0.0.1\", 44444))\nsrv1.listen()\nThread(target=client).start()\nconn, _ = srv1.accept()\nprint(conn.recv(1))\nconn.close()\nsrv1.close()\n\nsrv2 = socket.socket()\nsrv2.bind((\"127.0.0.1\", 44444))\nsrv2.listen()\nThread(target=client).start()\nprint(conn.recv(1))\nconn.close()\nsrv1.close()\n",
         "output": "b'x'\nOSError: [Errno NN] Address already in use\n",
         "explanation": "<p>\n  The kernel puts the active closer in <code>TIME_WAIT</code> for a while, else\n  delayed packets might bleed into fresh connections.\n</p>\n\n<p>\n  Set the <code>SO_REUSEADDR</code> option to allow binds to\n  <code>TIME_WAIT</code>s.\n</p>\n",
         "preface": "",
@@ -308,7 +308,7 @@ const QUESTIONS_PER_QUIZ = {
         "highlightjsAlias": "c"
       },
       {
-        "code": "#include <fcntl.h>\n#include <unistd.h>\n\nint main(int argc, char *argv[]) {\n  int fd = dup(1);\n  if (fork() == 0) {\n    write(fd, \"x\\n\", 2);\n  }\n}\n",
+        "code": "#include <fcntl.h>\n#include <sys/wait.h>\n#include <unistd.h>\n\nint main(int argc, char *argv[]) {\n  int fd = dup(1);\n  if (fork() == 0) {\n    write(fd, \"x\\n\", 2);\n  } else {\n    wait(0);\n  }\n}\n",
         "output": "x\n",
         "explanation": "<p><code>fork()</code> copies the parent's file descriptor table.</p>\n",
         "preface": "",
