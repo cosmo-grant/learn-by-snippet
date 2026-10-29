@@ -1,140 +1,57 @@
 # AGENTS.md
 
-This file provides guidelines for agents working on this codebase.
+## What this is
 
-## Project Overview
+A static-site quiz generator: read a Python/C/Go snippet, predict the output.
+Covers multiple topics (quizzes), not just concurrency — see `questions/`
+(`concurrency`, `slices`, `sockets`, `unix_system_calls`). `draft_questions/`
+holds work-in-progress questions not yet wired into a quiz.
 
-This is a Python concurrency quiz application. It generates a JavaScript quiz from Python code snippets that demonstrate Python concurrency concepts (threading, multiprocessing, asyncio, etc.).
+## Data flow (the part that's easy to get wrong)
 
-## Build/Lint/Test Commands
+1. Each quiz is a dir under `questions/`, e.g. `questions/concurrency/`, with
+   `title.txt`, `preamble.txt`, and numbered question dirs (`01/`, `02/`, ...).
+2. Each question dir has `main.<ext>` (the snippet), `output.txt`, `explanation.html`,
+   `preface.html`. All `main.*` files within one quiz must share the same extension
+   (`get_quiz_extension` asserts this) — don't mix languages within a quiz dir.
+3. `make questions` runs `make_questions.py`, which reads all quiz dirs and writes
+   **`questions_per_quiz.js`** (defines `QUESTIONS_PER_QUIZ`), loaded by `index.html`
+   and consumed by `quiz.js`. This file is generated — don't hand-edit it.
+4. There is no templating step (no Jinja2, no `templates/` dir) — the generator
+   writes the JS file directly with `json.dumps`.
 
-### Formatting (linting)
+## Commands
 
-Format all files (Python + HTML/JS):
+- `make questions` — regenerate `questions_per_quiz.js` after editing any question files.
+- `make format` — `uv tool run ruff format .` + `prettier --write .`. Run before committing.
+- `make preview` — serve the site locally with `live-server`.
+- `make view` — open the deployed GitHub Pages site.
+- `uv tool run ruff check .` — lint (not run by `make format`, which only formats).
+- There are no automated tests and no CI config in this repo.
 
-```bash
-make format
-```
+## Scripts use PEP 723 inline metadata
 
-This runs:
+`make_questions.py`, `consecutive_questions.py`, `space_questions.py`, and
+`notes_to_questions.py` each declare their own deps in a `# /// script` header, not
+a root `pyproject.toml`/`requirements.txt`. Run them with `uv run <file>.py`.
 
-- `uv tool run ruff format .` - Formats Python files
-- `npx prettier --write .` - Formats HTML/JS files
+- `consecutive_questions.py <quiz_dir>` — renumbers a quiz's question dirs to be consecutive.
+- `space_questions.py <quiz_dir>` — appends `00` to each question dir name, to free up
+  numbers for inserting a new question in between.
+- `notes_to_questions.py` — imports questions from a local Anki collection; depends on
+  the `anki` package and reads the collection file from an OS-specific path
+  (`~/.local/share/Anki2/...` on Linux, `~/Library/Application Support/Anki2/...` on macOS).
 
-### Running Python scripts
+## Snippet checking
 
-Generate quiz questions:
+Snippet correctness (does the code actually produce `output.txt`?) is checked with the
+external [snippet-checker](https://pypi.org/project/snippet-checker/) tool, configured via
+`questions/snippet_checker.toml` (per-quiz/per-question `snippet_checker.toml` overrides exist,
+e.g. to disable output checking for timing-sensitive snippets). This isn't wired into `make`;
+run it separately if verifying snippet output.
 
-```bash
-make questions
-```
+## Conventions worth preserving
 
-This runs:
-
-```bash
-uv run ./make_questions.py
-```
-
-### Running a single Python file
-
-To run any Python file in the project:
-
-```bash
-uv run <path/to/file.py>
-```
-
-### Running ruff directly
-
-```bash
-uv tool run ruff check .
-uv tool run ruff format --check .
-```
-
-## Code Style Guidelines
-
-### Python Version
-
-- Requires Python >= 3.14 (see `make_questions.py` header)
-
-### Imports
-
-- Standard library imports first, then third-party
-- Use explicit imports (e.g., `from time import sleep` not `import time`)
-- Group imports with blank lines between groups
-
-### Formatting
-
-- Follows ruff defaults (PEP 8)
-- 4 spaces for indentation
-- Line length: 88 characters (ruff default)
-- Use blank lines sparingly to group related code
-
-### Types
-
-- Use type hints for function signatures
-- Return type annotations required (e.g., `def main() -> None:`)
-- Use built-in types (e.g., `list[str]`, not `List[str]`)
-
-### Naming Conventions
-
-- `snake_case` for functions, variables
-- `PascalCase` for classes
-- `SCREAMING_SNAKE_CASE` for constants
-
-### Code Examples
-
-From the codebase:
-
-```python
-from time import sleep
-
-
-def main() -> None:
-    dirs = [path for path in Path("questions").iterdir() if path.is_dir()]
-    dirs.sort()
-    # ...
-```
-
-### Error Handling
-
-- Use explicit exception types
-- Let exceptions propagate unless specific handling is needed
-
-### Question Snippet Files
-
-Each question has a `questions/NN/snippet.py` file containing Python code that demonstrates a concurrency concept. These are executed to generate quiz answers.
-
-### Scripts Structure
-
-- `make_questions.py` - Main script that reads question files and generates `questions.js`
-- `questions/NN/snippet.py` - Python code snippets for each question
-- Templates use Jinja2 (see `templates/`)
-
-## File Organization
-
-```
-.
-├── make_questions.py       # Main script
-├── questions.js            # Generated output
-├── questions/              # Individual question directories (01, 02, ...)
-│   └── snippet.py          # Code snippet for the quiz
-├── templates/              # Jinja2 templates
-│   └── questions.jinja
-├── index.html
-├── quiz.js
-├── questions.js
-└── Makefile
-```
-
-## Development Workflow
-
-1. Edit question files in `questions/NN/` directory
-2. Run `make questions` to regenerate `questions.js`
-3. Run `make format` before committing
-
-## Key Dependencies
-
-- Python >= 3.14
-- jinja2 (for template rendering)
-- ruff (for Python formatting)
-- prettier (for HTML/JS formatting)
+- Explicit imports (`from time import sleep`, not `import time`).
+- Python >= 3.14, built-in generics (`list[str]`, not `List[str]`).
+- Return type annotations required, e.g. `def main() -> None:`.
