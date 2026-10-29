@@ -181,6 +181,13 @@ body {
   color: var(--color-primary-hover);
 }
 
+.back-link {
+  display: block;
+  margin-bottom: 1rem;
+  font-size: 1.2rem;
+  text-decoration: none;
+}
+
 #nav-bar {
   display: flex;
   flex-wrap: wrap;
