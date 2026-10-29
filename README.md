@@ -9,10 +9,11 @@ A collection of coding quizzes: read a snippet, predict the output.
 Like [Learn X in Y minutes](https://learnxinyminutes.com/),
 but active learning, and focused on concepts, not syntax or APIs.
 
+Work in progress, always.
+
 ## What do they cover?
 
 Python concurrency, Unix system calls, Go slices, ...
-Work in progress, always.
 
 ## But they don't cover xyz!
 
