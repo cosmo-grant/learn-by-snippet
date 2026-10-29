@@ -4,20 +4,19 @@
 
 ## What is this?
 
-A collection of Python quizzes.
-A practice project.
-A bit of fun.
+A collection of coding quizzes: read a snippet, predict the output.
+
+Like [Learn X in Y minutes](https://learnxinyminutes.com/),
+but active learning, and focused on concepts, not syntax or APIs.
 
 ## What do they cover?
 
-Concurrency, sockets, and more to come.
-Concepts, not APIs.
-As of 3.14, with the GIL.
+Python concurrency, Unix system calls, Go slices, ...
+Work in progress, always.
 
 ## But they don't cover xyz!
 
-They focus on the fundamentals.
-And no one wants 50 question quizzes.
+Contributions welcome.
 
 ## Did you use LLMs?
 
@@ -27,18 +26,19 @@ I wrote everything else, for better or worse, including all questions and explan
 I originally followed the example of [fstrings-wtf](https://github.com/mitsuhiko/fstrings-wtf/),
 though I've deviated a bit since.
 
-## Don't the timings in some outputs depend on the machine?
+## "The" output?
 
-Yes.
-Whether it's single- or multi-core.
-Whether it's fast or slow.
-Whether it's busy or idle.
-Whether it's on battery.
-And more.
+A snippet's output is not determined by its code.
 
-Some snippets have comments asking you to assume this or that.
-Generally, assume a typical machine in typical conditions.
-I checked the snippets on a MacBook Pro M3.
+- memory addresses vary across runs
+- errnos vary across platforms
+- timing depends on machine, contention, battery life, ...
+- compile or runtime options
+- printing to terminal or file
+- and many more
+
+Assume a typical machine under typical conditions.
+Where indeterminacy remains, just predict _an_ output.
 
 ## How did you check the snippets?
 
