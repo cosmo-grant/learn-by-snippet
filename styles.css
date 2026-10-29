@@ -137,7 +137,7 @@ body {
 
 #quiz-choices {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: 1fr;
   gap: var(--space-sm);
   width: 100%;
   max-width: 30rem;
@@ -153,13 +153,30 @@ body {
   border-radius: 4px;
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
+  text-align: left;
   gap: var(--space-sm);
 }
 
 #quiz-choices button img {
   height: 1.25em;
   width: auto;
+  flex-shrink: 0;
+}
+
+#quiz-choices .quiz-text {
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+}
+
+#quiz-choices .quiz-title {
+  font-size: var(--font-size-base);
+}
+
+#quiz-choices .quiz-preamble {
+  font-size: 0.8125rem;
+  color: var(--color-text-muted);
 }
 
 #quiz-choices button:hover {

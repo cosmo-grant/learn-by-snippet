@@ -47,6 +47,8 @@ def main() -> None:
     questions_per_quiz = {
         quiz_dir.name.replace("_", " "): {
             "extension": get_quiz_extension(quiz_dir),
+            "title": (quiz_dir / "title.txt").read_text().strip(),
+            "preamble": (quiz_dir / "preamble.txt").read_text().strip(),
             "questions": get_quiz_questions(quiz_dir),
         }
         for quiz_dir in quiz_dirs

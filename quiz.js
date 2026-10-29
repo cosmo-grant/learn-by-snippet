@@ -54,14 +54,35 @@ class Quiz {
   }
 
   populateQuizChoices() {
-    Object.keys(QUESTIONS_PER_QUIZ).forEach((title) => {
+    Object.keys(QUESTIONS_PER_QUIZ).forEach((key) => {
+      // The key is derived from the quiz directory name.
+      // It's internal-facing (quiz identifier, storage key).
+      // Changing it will nullify users' local storage.
+      //
+      // The title is from the quiz's title.txt.
+      // It's user-facing, and can change freely.
+      const quiz = QUESTIONS_PER_QUIZ[key];
+
       const button = document.createElement("button");
-      button.dataset.quiz = title;
+      button.dataset.quiz = key;
+
       const logo = document.createElement("img");
-      const extension = QUESTIONS_PER_QUIZ[title].extension;
-      logo.src = `logos/${extension}.svg`;
-      logo.alt = extension;
-      button.append(logo, " ", `${title}`);
+      logo.src = `logos/${quiz.extension}.svg`;
+      logo.alt = quiz.extension;
+
+      const title = document.createElement("span");
+      title.className = "quiz-title";
+      title.textContent = quiz.title;
+
+      const preamble = document.createElement("span");
+      preamble.className = "quiz-preamble";
+      preamble.textContent = quiz.preamble;
+
+      const text = document.createElement("span");
+      text.className = "quiz-text";
+      text.append(title, preamble);
+
+      button.append(logo, text);
       this.quizChoices.appendChild(button);
     });
     this.quizButtons = [...this.quizChoices.children];
@@ -198,7 +219,8 @@ class Quiz {
     if (savedQuizState) {
       // Offer user choice to continue or start afresh.
       this.showContinueDialog();
-      this.savedTitleDialog.textContent = this.currentQuiz;
+      this.savedTitleDialog.textContent =
+        QUESTIONS_PER_QUIZ[this.currentQuiz].title;
       this.savedQuestionDialog.textContent = savedQuizState.currentQuestion + 1;
       this.totalQuestionsDialog.textContent = this.questions.length;
 
