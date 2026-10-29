@@ -16,16 +16,51 @@
   <body>
     <div id="splash-screen">
       <h1>Learn by snippet</h1>
-      <p class="muted">
-        Snippets checked by
-        <a href="https://github.com/cosmo-grant/snippet-checker"
-          >snippet-checker</a
-        >.
-      </p>
       <div id="quiz-choices"></div>
-      <footer>
-        <a href="https://github.com/cosmo-grant/learn-by-snippet">source</a>
-      </footer>
+      <details id="about">
+        <summary>About</summary>
+        <h2>What is this?</h2>
+        <p>A collection of coding quizzes: read snippet, predict output.</p>
+
+        <p>Work in progress, always.</p>
+
+        <h2>Keyboard shortcuts</h2>
+        <ul>
+          <li><kbd>0</kbd> for ✘, <kbd>1</kbd> for ✔</li>
+          <li><kbd>&crarr;</kbd> or <kbd>Space</kbd> to advance</li>
+          <li>
+            <kbd>&larr;</kbd> or <kbd>&rarr;</kbd> to move between viewable
+            questions
+          </li>
+        </ul>
+
+        <h2>How are the snippets checked?</h2>
+        <p>
+          <a href="https://github.com/cosmo-grant/snippet-checker"
+            >snippet-checker</a
+          >
+        </p>
+
+        <h2>"The" output?</h2>
+        <p>
+          A snippet's output is not determined by its code. Memory addresses
+          vary across runs, errnos vary across platforms, timing depends on the
+          machine, and so on.
+        </p>
+        <p>
+          Assume a typical machine under typical conditions. Where indeterminacy
+          remains, just predict <em>an</em> output.
+        </p>
+
+        <h2>Found a bug? Have a suggestion?</h2>
+        <p>
+          Great! Please
+          <a href="https://github.com/cosmo-grant/learn-by-snippet/issues"
+            >open an issue</a
+          >. Here's the
+          <a href="https://github.com/cosmo-grant/learn-by-snippet">source</a>.
+        </p>
+      </details>
     </div>
 
     <div id="nav-bar"></div>

@@ -21,7 +21,8 @@ button {
 
 /* Focus states for accessibility */
 button:focus-visible,
-a:focus-visible {
+a:focus-visible,
+summary:focus-visible {
   outline: 2px solid var(--color-primary);
   outline-offset: 2px;
 }
@@ -103,14 +104,15 @@ body {
 }
 
 #splash-screen {
-  /* Center content vertically and horizontally */
+  /* Anchor content near the top so expanding "About" doesn't shift the
+     title and quiz list (it just grows the page below them). */
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  justify-content: flex-start;
   align-items: center;
   gap: var(--space-xl);
-  padding: var(--space-lg);
+  padding: 12vh var(--space-lg) var(--space-lg);
   text-align: center;
 }
 
@@ -121,10 +123,6 @@ body {
 
 #splash-screen p {
   margin: 0;
-}
-
-#splash-screen p.muted {
-  color: var(--color-text-muted);
 }
 
 #splash-screen a {
@@ -183,19 +181,38 @@ body {
   border-color: var(--color-primary-hover);
 }
 
-#splash-screen footer {
-  position: absolute;
-  bottom: var(--space-lg);
-  color: var(--color-text-muted);
-  font-size: 0.9375rem;
+#about {
+  width: 100%;
+  max-width: 30rem;
+  text-align: left;
 }
 
-#splash-screen footer a {
-  color: var(--color-text-muted);
+#about h2 {
+  margin: var(--space-lg) 0 var(--space-sm);
+  font-size: 1.125rem;
 }
 
-#splash-screen footer a:hover {
-  color: var(--color-primary-hover);
+#about summary {
+  color: var(--color-text-muted);
+  cursor: pointer;
+}
+
+#about p + p {
+  margin-top: var(--space-sm);
+}
+
+#about ul {
+  margin: 0;
+  padding-left: var(--space-lg);
+}
+
+#about kbd {
+  padding: 0 var(--space-xs);
+  font-family: var(--font-mono);
+  font-size: 0.875em;
+  background-color: var(--color-bg-secondary);
+  border: 1px solid var(--color-border);
+  border-radius: 3px;
 }
 
 .back-link {
