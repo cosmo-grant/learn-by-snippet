@@ -1,0 +1,4 @@
+x: [b c]
+y: [a b c]
+z: [c d]
+w: [a b c d]
