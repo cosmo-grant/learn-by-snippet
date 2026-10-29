@@ -18,6 +18,12 @@ Work in progress, always.
 
 Contributions welcome.
 
+## Keyboard support?
+
+- <kbd>0</kbd> for `✘`, <kbd>1</kbd> for `✔`.
+- <kbd>&crarr;</kbd> or <kbd>Space</kbd> to advance
+- <kbd>&larr;</kbd> or <kbd>&rarr;</kbd> to move between viewable questions
+
 ## Did you use LLMs?
 
 For styling, yes, plus small tasks here and there.
