@@ -107,7 +107,7 @@ const QUESTIONS_PER_QUIZ = {
       {
         "code": "import asyncio\nfrom time import sleep\n\n\nasync def io_bound():\n    sleep(3)\n    print(\"done\")\n\n\nasync def main():\n    io_bound()\n    io_bound()\n    print(\"here\")\n\n\nasyncio.run(main())\n",
         "output": "here\n",
-        "explanation": "<p>\n  A function defined with <code>async def</code> is a coroutine function and\n  returns a coroutine.\n</p>\n\n<p>Just creating a coroutine doens't schedule it on the event loop.</p>\n",
+        "explanation": "<p>\n  A function defined with <code>async def</code> is a coroutine function and\n  returns a coroutine.\n</p>\n\n<p>Just creating a coroutine doesn't schedule it on the event loop.</p>\n",
         "preface": "<p>A third approach: <code>asyncio</code>.</p>\n",
         "highlightjsAlias": "py"
       },
