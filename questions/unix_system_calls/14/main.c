@@ -1,16 +1,12 @@
-#include <stdio.h>
+#include <fcntl.h>
 #include <sys/wait.h>
 #include <unistd.h>
 
 int main(int argc, char *argv[]) {
-  if (fork() > 0) {
-    if (fork() > 0) {
-      wait(0);
-      printf("here\n");
-    } else {
-      sleep(1);
-    }
+  if (fork() == 0) {
+    close(1);
   } else {
-    sleep(2);
+    wait(0);
+    write(1, "x\n", 2);
   }
 }

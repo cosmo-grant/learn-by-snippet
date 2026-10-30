@@ -1,8 +1,12 @@
 #include <stdio.h>
+#include <sys/wait.h>
 #include <unistd.h>
 
 int main(int argc, char *argv[]) {
-  int p[2];
-  pipe(p);
-  printf("%d %d\n", p[0], p[1]);
+  if (fork() == 0) {
+    sleep(1);
+  } else {
+    wait(0);
+    printf("here\n");
+  }
 }

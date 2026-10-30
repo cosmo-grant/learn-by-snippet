@@ -1,0 +1,10 @@
+<p>
+  Reads on a <code>pipe()</code> block until data is available or all write-side
+  file descriptors are closed.
+</p>
+
+<p><code>fork()</code> copies the file descriptor table.</p>
+
+<p>The child closes its fd pointing at the pipe's write-end.</p>
+
+<p>But the parent doesn't, so it still hangs.</p>

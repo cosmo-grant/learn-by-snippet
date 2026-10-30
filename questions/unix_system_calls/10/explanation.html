@@ -1,6 +1,3 @@
-<p>
-  Reads on a <code>pipe()</code> block until data is available or all write-side
-  file descriptors are closed.
-</p>
+<p><code>open()</code> returns the least available file descriptor.</p>
 
-<p>Neither happens here, so it hangs.</p>
+<p>0, 1, 2 are already taken: stdin, stdout, stderr.</p>

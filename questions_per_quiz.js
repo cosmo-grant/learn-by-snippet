@@ -280,122 +280,171 @@ const QUESTIONS_PER_QUIZ = {
     "preamble": "Fork, exec, and friends.",
     "questions": [
       {
+        "code": "#include <stdio.h>\n#include <unistd.h>\n\nint main(int argc, char *argv[]) {\n  printf(\"hi\\n\");\n  fork();\n  printf(\"bye\\n\");\n}\n",
+        "output": "hi\nbye\nbye",
+        "explanation": "<p><code>fork()</code> duplicates the calling process.</p>\n\n<p>The child starts as if returning from <code>fork()</code>.</p>\n",
+        "preface": "<p>What does this ouput?</p>\n",
+        "highlightjsAlias": "c"
+      },
+      {
+        "code": "#include <stdio.h>\n#include <unistd.h>\n\nint main(int argc, char *argv[]) {\n  fork();\n  fork();\n  printf(\"hello\\n\");\n}\n",
+        "output": "hello\nhello\nhello\nhello\n",
+        "explanation": "<p>Multiple <code>fork()</code>s generate a tree.</p>\n",
+        "preface": "<p>What if we <code>fork()</code> twice?</p>\n",
+        "highlightjsAlias": "c"
+      },
+      {
+        "code": "#include <stdio.h>\n#include <unistd.h>\n\nint main(int argc, char *argv[]) {\n  printf(\"hi\");\n  fork();\n  printf(\"bye\");\n}\n",
+        "output": "hibyehibye",
+        "explanation": "<p>No newline, so <code>\"hi\"</code> is buffered.</p>\n\n<p><code>fork()</code> duplicates the parent, including the buffer.</p>\n",
+        "preface": "<p>Spot the difference?</p>\n",
+        "highlightjsAlias": "c"
+      },
+      {
+        "code": "#include <stdio.h>\n#include <sys/wait.h>\n#include <unistd.h>\n\nint main(int argc, char *argv[]) {\n  if (fork() == 0) {\n    printf(\"foo\\n\");\n  } else {\n    wait(NULL);\n    printf(\"bar\\n\");\n  }\n}\n",
+        "output": "foo\nbar\n",
+        "explanation": "<p><code>wait()</code> blocks until a child exits.</p>\n\n<p>(We'll come back to the <code>NULL</code>.)</p>\n",
+        "preface": "<p>Time to <code>wait</code>.</p>\n",
+        "highlightjsAlias": "c"
+      },
+      {
+        "code": "#include <stdio.h>\n#include <sys/wait.h>\n#include <unistd.h>\n\nint main(int argc, char *argv[]) {\n  int x;\n  x = wait(NULL);\n  printf(\"%d\\n\", x);\n}\n",
+        "output": "-1\n",
+        "explanation": "<p><code>wait()</code> returns -1 immediately.</p>\n",
+        "preface": "<p>What if no children to wait for?</p>\n",
+        "highlightjsAlias": "c"
+      },
+      {
+        "code": "#include <stdio.h>\n#include <sys/wait.h>\n#include <unistd.h>\n\nint main(int argc, char *argv[]) {\n  if (fork() == 0) {\n    sleep(1);\n  } else {\n    wait(0);\n    printf(\"here\\n\");\n  }\n}\n",
+        "output": "<~1s>\nhere\n",
+        "explanation": "<p>Yes.</p>\n",
+        "preface": "<p>Is <code>wait()</code> well-named?</p>\n",
+        "highlightjsAlias": "c"
+      },
+      {
+        "code": "#include <stdio.h>\n#include <sys/wait.h>\n#include <unistd.h>\n\nint main(int argc, char *argv[]) {\n  if (fork() > 0) {\n    if (fork() > 0) {\n      wait(0);\n      printf(\"here\\n\");\n    } else {\n      sleep(1);\n    }\n  } else {\n    sleep(2);\n  }\n}\n",
+        "output": "<~1s>\nhere\n",
+        "explanation": "<p><code>wait()</code> blocks until <em>a</em> child exits.</p>\n",
+        "preface": "<p>What happens if multiple children?</p>\n",
+        "highlightjsAlias": "c"
+      },
+      {
+        "code": "#include <stdio.h>\n#include <stdlib.h>\n#include <sys/wait.h>\n#include <unistd.h>\n\nint main(int argc, char *argv[]) {\n  int x;\n  if (fork() == 0) {\n    exit(1);\n  } else {\n    wait(&x);\n    printf(\"%d\\n\", x);\n  }\n}\n",
+        "output": "256\n",
+        "explanation": "<p>\n  <code>wait()</code> writes the child's exit code to the given address &mdash;\n  but <em>encoded</em>.\n</p>\n",
+        "preface": "<p>Let's turn to the exit codes.</p>\n",
+        "highlightjsAlias": "c"
+      },
+      {
+        "code": "#include <stdio.h>\n#include <stdlib.h>\n#include <sys/wait.h>\n#include <unistd.h>\n\nint main(int argc, char *argv[]) {\n  int x;\n  if (fork() == 0) {\n    exit(1);\n  } else {\n    wait(&x);\n    printf(\"%d\\n\", WEXITSTATUS(x));\n  }\n}\n",
+        "output": "1\n",
+        "explanation": "<p>The <code>WEXITSTATUS</code> macro knows how to extract the code.</p>\n",
+        "preface": "<p>Is there a nicer way to read that status?</p>\n",
+        "highlightjsAlias": "c"
+      },
+      {
+        "code": "#include <fcntl.h>\n#include <stdio.h>\n#include <unistd.h>\n\nint main(int argc, char *argv[]) {\n  int x;\n  x = open(argv[0], O_RDONLY);\n  printf(\"%d\\n\", x);\n}\n",
+        "output": "3\n",
+        "explanation": "<p><code>open()</code> returns the least available file descriptor.</p>\n\n<p>0, 1, 2 are already taken: stdin, stdout, stderr.</p>\n",
+        "preface": "<p>New topic: file descriptors.</p>\n",
+        "highlightjsAlias": "c"
+      },
+      {
         "code": "#include <fcntl.h>\n#include <stdio.h>\n#include <unistd.h>\n\nint main(int argc, char *argv[]) {\n  int x;\n  close(0);\n  x = open(argv[0], O_RDONLY);\n  printf(\"%d\\n\", x);\n}\n",
         "output": "0\n",
-        "explanation": "<p><code>open()</code> returns the least available file descriptor.</p>\n",
-        "preface": "",
+        "explanation": "<p>0 is free this time, so <code>open()</code> returns it.</p>\n",
+        "preface": "<p>How about this?</p>\n",
         "highlightjsAlias": "c"
       },
       {
         "code": "#include <stdio.h>\n#include <sys/wait.h>\n#include <unistd.h>\n\nint main(int argc, char *argv[]) {\n  int x;\n  char buf[] = \"x\\n\";\n  x = dup(1);\n  printf(\"%d\\n\", x);\n  write(x, &buf, 2);\n}\n",
         "output": "3\nx\n",
         "explanation": "<p>\n  <code>dup(fd)</code> returns a new file descriptor referring to the same file\n  as <code>fd</code>.\n</p>\n",
-        "preface": "",
-        "highlightjsAlias": "c"
-      },
-      {
-        "code": "#include <fcntl.h>\n#include <unistd.h>\n\nint main(int argc, char *argv[]) {\n  if (argc == 1) {\n    dup(1);\n    execl(argv[0], argv[0], \"extra\", (char *)NULL);\n  } else {\n    write(3, \"x\\n\", 2);\n  }\n}\n",
-        "output": "x\n",
-        "explanation": "<p><code>exec()</code> preserves the file descriptor table.</p>\n",
-        "preface": "",
+        "preface": "<p>What does <code>dup()</code> do?</p>\n",
         "highlightjsAlias": "c"
       },
       {
         "code": "#include <fcntl.h>\n#include <sys/wait.h>\n#include <unistd.h>\n\nint main(int argc, char *argv[]) {\n  int fd = dup(1);\n  if (fork() == 0) {\n    write(fd, \"x\\n\", 2);\n  } else {\n    wait(0);\n  }\n}\n",
         "output": "x\n",
         "explanation": "<p><code>fork()</code> copies the parent's file descriptor table.</p>\n",
-        "preface": "",
+        "preface": "<p>\n  What happens to a <code>dup()</code>'d descriptor across <code>fork()</code>?\n</p>\n",
         "highlightjsAlias": "c"
       },
       {
         "code": "#include <fcntl.h>\n#include <sys/wait.h>\n#include <unistd.h>\n\nint main(int argc, char *argv[]) {\n  if (fork() == 0) {\n    close(1);\n  } else {\n    wait(0);\n    write(1, \"x\\n\", 2);\n  }\n}\n",
         "output": "x\n",
-        "explanation": "<p><code>fork()</code> <em>copies</em> the parent's file descriptor table.</p>\n\n<p>So, for example, the parent doesn't see the child's changes.</p>\n",
-        "preface": "",
+        "explanation": "<p>To repeat: <code>fork()</code> copies the parent's file descriptor table.</p>\n\n<p>The parent doesn't see the child's changes.</p>\n",
+        "preface": "<p>So what about this?</p>\n",
         "highlightjsAlias": "c"
       },
       {
-        "code": "#include <fcntl.h>\n#include <stdio.h>\n#include <unistd.h>\n\nint main(int argc, char *argv[]) {\n  int x;\n  x = open(argv[0], O_RDONLY);\n  printf(\"%d\\n\", x);\n}\n",
-        "output": "3\n",
-        "explanation": "<p><code>open()</code> returns the least available file descriptor.</p>\n",
-        "preface": "",
+        "code": "#include <fcntl.h>\n#include <unistd.h>\n\nint main(int argc, char *argv[]) {\n  int fd1 = open(\"testfile\", O_CREAT | O_RDWR, 0644);\n  int fd2 = open(\"testfile\", O_RDWR);\n  write(fd1, \"ab\", 1);\n  char buf[1];\n  read(fd2, buf, 1);\n  write(1, buf, 1);\n}\n",
+        "output": "a",
+        "explanation": "<p><code>open()</code>s get independent offsets.</p>\n",
+        "preface": "<p>What if we <code>open()</code> the same file twice?</p>\n",
+        "highlightjsAlias": "c"
+      },
+      {
+        "code": "#include <fcntl.h>\n#include <sys/wait.h>\n#include <unistd.h>\n\nint main(int argc, char *argv[]) {\n  int fd = open(\"./my_file\", O_CREAT | O_WRONLY | O_TRUNC, S_IRWXU);\n  int rc = fork();\n  if (rc == 0) {\n    write(fd, \"hello\\n\", 6);\n  } else {\n    wait(NULL);\n    write(fd, \"goodbye\\n\", 8);\n\n    char buf[64];\n    int rfd = open(\"./my_file\", O_RDONLY);\n    int n = read(rfd, buf, sizeof(buf));\n    write(1, buf, n);\n  }\n}\n",
+        "output": "hello\ngoodbye\n",
+        "explanation": "<p><code>fork()</code> copies the parent's file descriptor table.</p>\n\n<p>\n  But parent and child's descriptors point at the same file description, which\n  holds the offset.\n</p>\n\n<p>So no clobbering.</p>\n",
+        "preface": "<p>Contrast that with <code>fork()</code>.</p>\n",
+        "highlightjsAlias": "c"
+      },
+      {
+        "code": "#include <stdio.h>\n#include <string.h>\n#include <unistd.h>\n\nint main(int argc, char *argv[]) {\n  int rc = fork();\n  if (rc == 0) {\n    char *myargs[3];\n    myargs[0] = strdup(\"echo\");\n    myargs[1] = strdup(\"this\");\n    myargs[2] = NULL;\n    execvp(myargs[0], myargs);\n    printf(\"here\\n\");\n  }\n}\n",
+        "output": "this",
+        "explanation": "<p>\n  <code>exec()</code> overwrites the calling process's code and data with the\n  given executable's.\n</p>\n\n<p>A successful call to <code>exec()</code> never returns.</p>\n",
+        "preface": "<p>Now <code>exec()</code>. What does it do?</p>\n",
+        "highlightjsAlias": "c"
+      },
+      {
+        "code": "#include <stdio.h>\n#include <unistd.h>\n\nint x = 111;\n\nint main(int argc, char *argv[]) {\n  if (argc == 1) {\n    x = 222;\n    execl(argv[0], argv[0], \"again\", (char *)NULL);\n  }\n  printf(\"%d\\n\", x);\n}\n",
+        "output": "111\n",
+        "explanation": "<p>\n  <code>exec()</code> overwrites text and data, and re-initializes the address\n  space.\n</p>\n\n<p>So <code>x</code> goes back to its initial value.</p>\n",
+        "preface": "<p>What happens to static data?</p>\n",
+        "highlightjsAlias": "c"
+      },
+      {
+        "code": "#include <fcntl.h>\n#include <unistd.h>\n\nint main(int argc, char *argv[]) {\n  if (argc == 1) {\n    dup(1);\n    execl(argv[0], argv[0], \"extra\", (char *)NULL);\n  } else {\n    write(3, \"x\\n\", 2);\n  }\n}\n",
+        "output": "x\n",
+        "explanation": "<p><code>exec()</code> preserves the file descriptor table.</p>\n",
+        "preface": "<p>And to open file descriptors?</p>\n",
         "highlightjsAlias": "c"
       },
       {
         "code": "#include <stdio.h>\n#include <unistd.h>\n\nint main(int argc, char *argv[]) {\n  int p[2];\n  pipe(p);\n  printf(\"%d %d\\n\", p[0], p[1]);\n}\n",
         "output": "3 4\n",
         "explanation": "<p>\n  <code>pipe()</code> creates a small kernel buffer, exposing it to the process\n  as two file descriptors.\n</p>\n",
-        "preface": "",
-        "highlightjsAlias": "c"
-      },
-      {
-        "code": "#include <unistd.h>\n\nint main(int argc, char *argv[]) {\n  int p[2];\n  char buf[1];\n  pipe(p);\n  if (fork() == 0) {\n    sleep(1);\n    write(p[1], \"x\", 1);\n  } else {\n    read(p[0], buf, 1);\n    write(1, buf, 1);\n  }\n}\n",
-        "output": "<~1s>\nx",
-        "explanation": "<p>\n  Reads on a <code>pipe()</code> block until data is available or all write-side\n  file descriptors are closed.\n</p>\n\n<p>Data is available here.</p>\n",
-        "preface": "",
-        "highlightjsAlias": "c"
-      },
-      {
-        "code": "#include <unistd.h>\n\nint main(int argc, char *argv[]) {\n  int p[2];\n  char buf[1];\n  pipe(p);\n  if (fork() == 0) {\n    sleep(1);\n    close(p[1]);\n  } else {\n    read(p[0], buf, 1);\n  }\n}\n",
-        "output": "...\n",
-        "explanation": "<p>\n  Reads on a <code>pipe()</code> block until data is available or all write-side\n  file descriptors are closed.\n</p>\n\n<p><code>fork()</code> copies the file descriptor table.</p>\n\n<p>The child closes its fd pointing at the pipe's write-end.</p>\n\n<p>But the parent doesn't, so it still hangs.</p>\n",
-        "preface": "",
-        "highlightjsAlias": "c"
-      },
-      {
-        "code": "#include <unistd.h>\n\nint main(int argc, char *argv[]) {\n  int p[2];\n  char buf[1];\n  pipe(p);\n  if (fork() == 0) {\n    sleep(1);\n    close(p[1]);\n  } else {\n    close(p[1]);\n    read(p[0], buf, 1);\n  }\n}\n",
-        "output": "",
-        "explanation": "<p>\n  Reads on a <code>pipe()</code> block until data is available or all write-side\n  file descriptors are closed.\n</p>\n\n<p><code>fork()</code> copies the file descriptor table.</p>\n\n<p>Both parent and child close their fds pointing at the pipe's write-end.</p>\n\n<p>So all good.</p>\n",
-        "preface": "",
+        "preface": "<p>Last topic: pipes. What does <code>pipe()</code> give us?</p>\n",
         "highlightjsAlias": "c"
       },
       {
         "code": "#include <unistd.h>\n\nint main(int argc, char *argv[]) {\n  int p[2];\n  char buf[1];\n  pipe(p);\n  read(p[0], buf, 1);\n}\n",
         "output": "...\n",
         "explanation": "<p>\n  Reads on a <code>pipe()</code> block until data is available or all write-side\n  file descriptors are closed.\n</p>\n\n<p>Neither happens here, so it hangs.</p>\n",
-        "preface": "",
+        "preface": "<p>A <code>read()</code> with no <code>write()</code>s. What happens?</p>\n",
         "highlightjsAlias": "c"
       },
       {
-        "code": "#include <fcntl.h>\n#include <unistd.h>\n\nint main(int argc, char *argv[]) {\n  int fd1 = open(\"testfile\", O_CREAT | O_RDWR, 0644);\n  int fd2 = open(\"testfile\", O_RDWR);\n  write(fd1, \"ab\", 1);\n  char buf[1];\n  read(fd2, buf, 1);\n  write(1, buf, 1);\n}\n",
-        "output": "a",
-        "explanation": "<p>\n  Separate calls to <code>open()</code> on the same file get independent\n  offsets.\n</p>\n",
-        "preface": "",
+        "code": "#include <unistd.h>\n\nint main(int argc, char *argv[]) {\n  int p[2];\n  char buf[1];\n  pipe(p);\n  if (fork() == 0) {\n    sleep(1);\n    write(p[1], \"x\", 1);\n  } else {\n    read(p[0], buf, 1);\n    write(1, buf, 1);\n  }\n}\n",
+        "output": "<~1s>\nx",
+        "explanation": "<p>\n  Reads on a <code>pipe()</code> block until data is available or all write-side\n  file descriptors are closed.\n</p>\n\n<p>Data is available here.</p>\n",
+        "preface": "<p>What if some data does get written?</p>\n",
         "highlightjsAlias": "c"
       },
       {
-        "code": "#include <stdio.h>\n#include <stdlib.h>\n\nchar **split_line(char *line) {\n  int line_idx, words_idx;\n  char *word_start;\n  char **words = malloc(10 * sizeof(char *));\n\n  words_idx = 0;\n  word_start = line;\n  for (line_idx = 0;; line_idx++) {\n    if (*(line + line_idx) == ' ' || *(line + line_idx) == '\\0') {\n      *(line + line_idx) = '\\0';\n      words[words_idx] = word_start;\n      word_start = line + line_idx + 1;\n      words_idx++;\n    }\n    if (*(line + line_idx) == '\\0') {\n      break;\n    }\n  }\n\n  return words;\n}\n\nint main(int argc, char **argv) {\n  char **words;\n  char line[] = \"foo bar\\n\";\n  words = split_line(line);\n  printf(\"%s\", *words);\n}\n",
-        "output": "foo",
-        "explanation": "<p>\n  <code>split_line()</code> splits a line into words on space, returning an\n  array of words.\n</p>\n\n<p>\n  When it hits the end of a word, it writes a null terminator so the word can be\n  used as its own string.\n</p>\n",
-        "preface": "",
+        "code": "#include <unistd.h>\n\nint main(int argc, char *argv[]) {\n  int p[2];\n  char buf[1];\n  pipe(p);\n  if (fork() == 0) {\n    sleep(1);\n    close(p[1]);\n  } else {\n    read(p[0], buf, 1);\n  }\n}\n",
+        "output": "...\n",
+        "explanation": "<p>\n  Reads on a <code>pipe()</code> block until data is available or all write-side\n  file descriptors are closed.\n</p>\n\n<p><code>fork()</code> copies the file descriptor table.</p>\n\n<p>The child closes its fd pointing at the pipe's write-end.</p>\n\n<p>But the parent doesn't, so it still hangs.</p>\n",
+        "preface": "<p>What if the child closes its write end, but the parent doesn't?</p>\n",
         "highlightjsAlias": "c"
       },
       {
-        "code": "#include <stdio.h>\n#include <sys/wait.h>\n#include <unistd.h>\n\nint main(int argc, char *argv[]) {\n  int x;\n  if (fork() > 0) {\n    wait(&x);\n    printf(\"%d\\n\", x);\n  }\n}\n",
-        "output": "0\n",
-        "explanation": "<p><code>wait()</code> puts the child's exit status in the given address.</p>\n",
-        "preface": "",
-        "highlightjsAlias": "c"
-      },
-      {
-        "code": "#include <stdio.h>\n#include <sys/wait.h>\n#include <unistd.h>\n\nint main(int argc, char *argv[]) {\n  if (fork() > 0) {\n    if (fork() > 0) {\n      wait(0);\n      printf(\"here\\n\");\n    } else {\n      sleep(1);\n    }\n  } else {\n    sleep(2);\n  }\n}\n",
-        "output": "<~1s>\nhere\n",
-        "explanation": "<p><code>wait()</code> waits until <em>some</em> child exits.</p>\n",
-        "preface": "",
-        "highlightjsAlias": "c"
-      },
-      {
-        "code": "#include <stdio.h>\n#include <sys/wait.h>\n#include <unistd.h>\n\nint main(int argc, char *argv[]) {\n  int x;\n  x = wait(0);\n  printf(\"%d\\n\", x);\n}\n",
-        "output": "-1\n",
-        "explanation": "<p><code>wait()</code> returns -1 immediately if there are no children.</p>\n",
-        "preface": "",
-        "highlightjsAlias": "c"
-      },
-      {
-        "code": "#include <stdio.h>\n#include <sys/wait.h>\n#include <unistd.h>\n\nint main(int argc, char *argv[]) {\n  if (fork() == 0) {\n    sleep(1);\n  } else {\n    wait(0);\n    printf(\"here\\n\");\n  }\n}\n",
-        "output": "<~1s>\nhere\n",
-        "explanation": "<p><code>wait()</code> waits.</p>\n",
-        "preface": "",
+        "code": "#include <unistd.h>\n\nint main(int argc, char *argv[]) {\n  int p[2];\n  char buf[1];\n  pipe(p);\n  if (fork() == 0) {\n    sleep(1);\n    close(p[1]);\n  } else {\n    close(p[1]);\n    read(p[0], buf, 1);\n  }\n}\n",
+        "output": "",
+        "explanation": "<p>All good this time.</p>\n",
+        "preface": "<p>And if both close it?</p>\n",
         "highlightjsAlias": "c"
       }
     ]

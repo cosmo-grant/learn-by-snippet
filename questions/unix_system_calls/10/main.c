@@ -1,8 +1,9 @@
+#include <fcntl.h>
+#include <stdio.h>
 #include <unistd.h>
 
 int main(int argc, char *argv[]) {
-  int p[2];
-  char buf[1];
-  pipe(p);
-  read(p[0], buf, 1);
+  int x;
+  x = open(argv[0], O_RDONLY);
+  printf("%d\n", x);
 }

@@ -1,1 +1,8 @@
-<p><code>wait()</code> waits.</p>
+<p><code>fork()</code> copies the parent's file descriptor table.</p>
+
+<p>
+  But parent and child's descriptors point at the same file description, which
+  holds the offset.
+</p>
+
+<p>So no clobbering.</p>
