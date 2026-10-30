@@ -11,7 +11,7 @@ async def bar():
 
 async def main():
     asyncio.create_task(foo())
-    await bar()
+    await asyncio.create_task(bar())
 
 
 asyncio.run(main())

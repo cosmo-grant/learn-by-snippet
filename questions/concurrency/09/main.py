@@ -1,11 +1,9 @@
 from threading import Thread
-from time import thread_time
 
 
 def cpu_bound():
-    start = thread_time()
-    while thread_time() - start < 3:
-        continue
+    # assume takes 3s of cpu
+    sum(range(2**25))
     print("done")
 
 

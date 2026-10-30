@@ -1,5 +1,5 @@
-<~3s>
-done
-<~3s>
-done
+Exception in thread Thread-1 (bad):
+Traceback (most recent call last):
+  ...
+Exception
 here

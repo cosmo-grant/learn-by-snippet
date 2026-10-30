@@ -1,5 +1,4 @@
-Exception in thread Thread-1 (bad):
-Traceback (most recent call last):
-  ...
-Exception
 here
+<~3s>
+done
+done

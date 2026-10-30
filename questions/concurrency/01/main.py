@@ -1,7 +1,11 @@
 from time import sleep
 
-sleep(3)
-print("done")
-sleep(3)
-print("done")
+
+def io_bound():
+    sleep(3)
+    print("done")
+
+
+io_bound()
+io_bound()
 print("here")

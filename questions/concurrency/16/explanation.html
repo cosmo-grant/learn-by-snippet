@@ -1,3 +1,4 @@
-<p>Awaiting a coroutine blocks until it completes.</p>
-
-<p>No speedup yet.</p>
+<p>
+  <code>await asyncio.sleep()</code> does pass control to the event loop, but
+  there's no other work scheduled at that point.
+</p>

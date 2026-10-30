@@ -7,23 +7,16 @@ const QUESTIONS_PER_QUIZ = {
     "preamble": "Threading, multiprocessing, asyncio. With the GIL.",
     "questions": [
       {
-        "code": "from time import sleep\n\nsleep(3)\nprint(\"done\")\nsleep(3)\nprint(\"done\")\nprint(\"here\")\n",
+        "code": "from time import sleep\n\n\ndef io_bound():\n    sleep(3)\n    print(\"done\")\n\n\nio_bound()\nio_bound()\nprint(\"here\")\n",
         "output": "<~3s>\ndone\n<~3s>\ndone\nhere\n",
         "explanation": "<p>One process, one thread, no event loop.</p>\n\n<p>Simple. Slow.</p>\n",
         "preface": "<p>What does this output?</p>\n",
         "highlightjsAlias": "py"
       },
       {
-        "code": "from time import sleep\n\n\ndef io_bound():\n    sleep(3)\n    print(\"done\")\n\n\nio_bound()\nio_bound()\nprint(\"here\")\n",
-        "output": "<~3s>\ndone\n<~3s>\ndone\nhere\n",
-        "explanation": "<p>No different of course.</p>\n",
-        "preface": "<p>Let's extract the work into a function. Output?</p>\n",
-        "highlightjsAlias": "py"
-      },
-      {
         "code": "from time import thread_time\n\n\ndef cpu_bound():\n    start = thread_time()\n    while thread_time() - start < 3:\n        continue\n    print(\"done\")\n\n\ncpu_bound()\ncpu_bound()\nprint(\"here\")\n",
         "output": "<~3s>\ndone\n<~3s>\ndone\nhere\n",
-        "explanation": "<p>Again, no different.</p>\n\n<p>\n  (The busyloop is a placeholder: think of it as anything which needs 3s of\n  CPU.)\n</p>\n",
+        "explanation": "<p>No different of course.</p>\n\n<p>\n  (The busyloop is a placeholder: think of it as anything which needs 3s of\n  CPU.)\n</p>\n",
         "preface": "<p>What if the work is CPU-bound?</p>\n",
         "highlightjsAlias": "py"
       },

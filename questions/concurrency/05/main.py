@@ -10,5 +10,7 @@ def io_bound():
 thread1 = Thread(target=io_bound)
 thread2 = Thread(target=io_bound)
 thread1.start()
+thread1.join()
 thread2.start()
+thread2.join()
 print("here")

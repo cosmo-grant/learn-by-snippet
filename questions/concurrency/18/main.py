@@ -1,9 +1,8 @@
 import asyncio
-from time import sleep
 
 
 async def io_bound():
-    sleep(3)
+    await asyncio.sleep(3)
     print("done")
 
 

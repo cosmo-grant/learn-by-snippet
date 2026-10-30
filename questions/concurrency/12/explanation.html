@@ -1,8 +1,4 @@
-<p>Process objects run in separate processes, each with their own GIL.</p>
-
-<p>So they <em>can</em> run in parallel.</p>
-
 <p>
-  But for IO-bound work threads might be the better choice, because lower
-  overhead.
+  <code>thread1</code> and <code>thread2</code> are CPU-bound, so running in
+  parallel helps.
 </p>

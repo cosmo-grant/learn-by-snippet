@@ -1,9 +1,8 @@
-<p>
-  <code>threading.excepthook()</code> prints on stderr an exception raised by
-  <code>Thread.run()</code>.
-</p>
+<p>Process objects run in separate processes, each with their own GIL.</p>
+
+<p>So they <em>can</em> run in parallel.</p>
 
 <p>
-  But the exception doesn't propagate to the main thread, so
-  <code>here</code> is still printed and the exit code is 0.
+  But for IO-bound work threads might be the better choice, because lower
+  overhead.
 </p>

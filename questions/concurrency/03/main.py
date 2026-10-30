@@ -1,3 +1,4 @@
+from threading import Thread
 from time import thread_time
 
 
@@ -8,6 +9,8 @@ def cpu_bound():
     print("done")
 
 
-cpu_bound()
-cpu_bound()
+thread1 = Thread(target=cpu_bound)
+thread2 = Thread(target=cpu_bound)
+thread1.start()
+thread2.start()
 print("here")

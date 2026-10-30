@@ -1,15 +1,15 @@
 import asyncio
+from time import sleep
 
 
 async def io_bound():
-    await asyncio.sleep(3)
-    print("here")
+    sleep(3)
+    print("done")
 
 
 async def main():
-    await io_bound()
-    await io_bound()
-    print("done")
+    await asyncio.gather(io_bound(), io_bound())
+    print("here")
 
 
 asyncio.run(main())

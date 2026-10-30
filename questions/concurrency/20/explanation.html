@@ -1,11 +1,3 @@
-<p>
-  <code>asyncio.to_thread()</code> is useful for async-unaware IO-bound
-  functions.
-</p>
+<p><code>create_task()</code> schedules the task for execution.</p>
 
-<p>It runs the passed function in a separate thread, returning a coroutine.</p>
-
-<p>
-  <code>sleep()</code> releases the GIL so control can pass back to the main
-  thread.
-</p>
+<p>But the main coroutine keeps control.</p>

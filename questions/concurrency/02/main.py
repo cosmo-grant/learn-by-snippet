@@ -1,11 +1,13 @@
-from time import sleep
+from time import thread_time
 
 
-def io_bound():
-    sleep(3)
+def cpu_bound():
+    start = thread_time()
+    while thread_time() - start < 3:
+        continue
     print("done")
 
 
-io_bound()
-io_bound()
+cpu_bound()
+cpu_bound()
 print("here")

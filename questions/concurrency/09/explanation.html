@@ -1,5 +1,8 @@
+<p>Beware!</p>
+
 <p>
-  <code>thread1.join()</code> blocks the main thread, not <code>thread2</code>.
+  The interpreter doesn't pause a thread while it's running native code, like
+  this <code>sum()</code> does.
 </p>
 
-<p>But they're still CPU-bound so the total time is unchanged.</p>
+<p>Exercise: try <code>sum(i for i in range(2**25))</code>.</p>

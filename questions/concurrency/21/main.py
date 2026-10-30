@@ -6,7 +6,7 @@ async def foo():
 
 
 async def main():
-    asyncio.create_task(foo())
+    await asyncio.create_task(foo())
     print("in main")
 
 

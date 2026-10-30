@@ -1,4 +1,6 @@
+<p><code>gather()</code> runs the awaitables concurrently.</p>
+
 <p>
-  <code>await asyncio.sleep()</code> does pass control to the event loop, but
-  there's no other work scheduled at that point.
+  But still no speedup, because <code>sleep()</code> blocks the one and only
+  thread.
 </p>

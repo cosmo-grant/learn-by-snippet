@@ -1,16 +1,8 @@
-<p>
-  Three threads are in play: the main thread, <code>thread1</code>,
-  <code>thread2</code>.
-</p>
+<p>Speedup, despite the GIL!</p>
 
-<p>A thread runs only when it holds the Global Interpreter Lock.</p>
+<p>Interleaved, not parallel. But for IO-bound work, interleaving helps.</p>
 
 <p>
-  The running thread is paused frequently and a ready thread gets the GIL and
-  runs. <em>Interleaved, not parallel.</em>
-</p>
-
-<p>
-  The main thread prints almost immediately. The others continue interleaving,
-  so take ~3s of CPU but ~6s of wall-clock.
+  <code>thread1</code> and <code>thread2</code> don't <em>run</em> in parallel,
+  because of the GIL. But they can <em>wait</em> in parallel, so to speak.
 </p>

@@ -1,16 +1,11 @@
 from threading import Thread
 
 
-def cpu_bound():
-    # assume takes 3s of cpu
-    sum(range(2**25))
-    print("done")
+def bad():
+    raise Exception
 
 
-thread1 = Thread(target=cpu_bound)
-thread2 = Thread(target=cpu_bound)
-thread1.start()
-thread2.start()
-thread1.join()
-thread2.join()
+thread = Thread(target=bad)
+thread.start()
+thread.join()
 print("here")

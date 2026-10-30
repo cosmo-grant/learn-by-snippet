@@ -8,8 +8,8 @@ async def io_bound():
 
 
 async def main():
-    io_bound()
-    io_bound()
+    await io_bound()
+    await io_bound()
     print("here")
 
 
