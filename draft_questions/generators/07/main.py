@@ -1,12 +1,10 @@
-def gen(stream):
-    for n in stream:
-        if n % 2 == 0:
-            return
-        else:
-            yield n
+def counter(maximum):
+    i = 0
+    while i < maximum:
+        yield i
+        i += 1
 
 
-nums = [1, 3, 4, 1, 2]
-
-for n in gen(nums):
-    print(n)
+it = counter(3)
+for _ in range(4):
+    print(next(it))

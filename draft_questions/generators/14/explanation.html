@@ -1,1 +1,11 @@
-Any uncaught exceptions, including the one you pass in, propagate to the caller.
+<p>
+  <code>send(value)</code> resumes the generator, and the paused
+  <code>yield</code> expression evaluates to <code>value</code>.
+</p>
+
+<p>
+  But a just-created generator hasn't reached a <code>yield</code>, so there's
+  nothing to receive the value. First advance it to the first
+  <code>yield</code> with <code>next()</code> or <code>send(None)</code>. This
+  is called "priming" the generator.
+</p>

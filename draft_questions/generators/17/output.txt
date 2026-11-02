@@ -1,2 +1,4 @@
 1
-StopIteration
+Traceback (most recent call last):
+  ...
+ValueError

@@ -1,14 +1,12 @@
-def response_simulator():
-    raise ConnectionError
-    yield "ok"
+from contextlib import contextmanager
 
 
-responses = response_simulator()
+@contextmanager
+def func():
+    print("foo")
+    yield "bar"
+    print("baz")
 
-for _ in range(2):
-    try:
-        response = next(responses)
-    except ConnectionError:
-        print("connection error")
-    else:
-        print(response)
+
+with func() as blah:
+    print(blah)

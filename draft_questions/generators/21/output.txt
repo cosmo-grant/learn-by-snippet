@@ -1,3 +1,5 @@
 1
-2
-3
+made it
+Traceback (most recent call last):
+  ...
+StopIteration

@@ -1,2 +1,10 @@
-A return in a generator raises a <code>StopIteration</code>. The return value is
-smuggled out via <code>StopIteration.value</code>.
+<p>
+  <code>GeneratorExit</code> inherits from <code>BaseException</code>, not
+  <code>Exception</code>, because it's not an error. So
+  <code>except Exception</code> doesn't catch it, and <code>close()</code> works
+  as normal.
+</p>
+
+<p>
+  (Same idea as <code>KeyboardInterrupt</code> and <code>SystemExit</code>.)
+</p>

@@ -1,3 +1,8 @@
-There is no <code>yield</code> expression to receive a value when the coroutine
-has just been created. Use <code>next()</code> or <code>send(None)</code> to
-advance execution to the first <code>yield</code> ("priming the coroutine").
+<p>
+  <code>reversed()</code> needs an object with <code>__reversed__()</code>, or a
+  sequence (with <code>__len__()</code> and <code>__getitem__()</code>). A
+  generator has neither: it produces items one at a time, with no idea what's
+  coming.
+</p>
+
+<p>Use <code>reversed(list(...))</code> if you must.</p>

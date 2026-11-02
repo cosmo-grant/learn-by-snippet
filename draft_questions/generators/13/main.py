@@ -1,12 +1,13 @@
-def generator():
-    while True:
-        try:
-            yield 1
-        except Exception as exception:
-            yield 2
+def gen():
+    yield 1
+    yield 2
+    return 3
 
 
-g = generator()
-print(next(g))
-print(g.throw(ValueError))
-print(next(g))
+g = gen()
+print(g.send(None))
+print(g.send(None))
+try:
+    g.send(None)
+except StopIteration as exc:
+    print(exc.value)

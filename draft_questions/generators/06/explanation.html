@@ -1,5 +1,4 @@
-A function with a yield expression is a generator function, and returns a
-generator. Each time you call <code>next(it)</code>, the code in
-<code>counter</code> runs until the <code>yield</code>, then returns a value and
-suspends execution, preserving the state. If you call <code>next(it)</code> and
-the function returns, a <code>StopIteration</code> error is thrown.
+<p>
+  A function containing <code>yield</code> is a generator function. Calling it
+  doesn't run its body: it returns a generator.
+</p>

@@ -1,2 +1,13 @@
-A function with a <code>yield</code> statement is a generator function, and
-returns a generator.
+<p>
+  <code>zip()</code> calls <code>iter()</code> on each argument, then repeatedly
+  calls <code>next()</code> on the results.
+</p>
+
+<p>
+  For a list, <code>iter()</code> returns a fresh iterator each time, so the two
+  arguments are independent. For a generator, <code>iter()</code> returns the
+  generator itself. Both arguments are the <em>same</em> iterator, so they take
+  turns consuming it.
+</p>
+
+<p>Generators are single-use.</p>

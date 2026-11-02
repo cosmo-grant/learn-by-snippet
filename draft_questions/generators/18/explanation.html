@@ -1,3 +1,10 @@
-<code>close() </code>throws a <code>GeneratorExit</code> at the point the
-generator function was paused. The generator is given a chance to exit
-gracefully.
+<p>
+  <code>close()</code> raises <code>GeneratorExit</code> at the paused
+  <code>yield</code>. Normally the generator doesn't catch it, so it finishes,
+  and <code>close()</code> swallows the <code>GeneratorExit</code>.
+</p>
+
+<p>
+  The generator is finished, so <code>next()</code> raises
+  <code>StopIteration</code>.
+</p>

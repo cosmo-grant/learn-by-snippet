@@ -1,2 +1,4 @@
-1
+connection error
+Traceback (most recent call last):
+  ...
 StopIteration

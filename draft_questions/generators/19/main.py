@@ -1,12 +1,9 @@
 def generator():
-    try:
-        yield 1
-        yield 2
-    finally:
-        yield 3
+    yield 1
+    yield 2
 
 
 g = generator()
 print(next(g))
 g.close()
-print(next(g))
+g.close()

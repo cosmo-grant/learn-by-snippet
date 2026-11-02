@@ -1,6 +1,9 @@
-def foo(x):
-    yield from range(x, -1, -1)
-    yield from range(x)
+def f(x):
+    if x:
+        return 1
+    yield 2
 
 
-print(list(foo(3)))
+print(*f(False))
+print("blah")
+print(*f(True))

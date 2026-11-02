@@ -1,9 +1,12 @@
 def generator():
-    yield 1
-    yield 2
+    while True:
+        try:
+            yield 1
+        except Exception as exception:
+            yield 2
 
 
 g = generator()
 print(next(g))
-g.close()
-g.close()
+print(g.throw(ValueError))
+print(next(g))

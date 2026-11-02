@@ -1,1 +1,9 @@
-Generators are lazy: they do no work until forced.
+<p>
+  Generators are lazy: creating one runs none of its code. Each
+  <code>next()</code> does just enough work to produce the next item.
+</p>
+
+<p>
+  (With one exception: the outermost iterable, here <code>range(3)</code>, is
+  evaluated straight away.)
+</p>

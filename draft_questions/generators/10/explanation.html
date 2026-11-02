@@ -1,2 +1,16 @@
-A function with a <code>yield from </code>statement, just like a function with a
-<code>yield</code> statement, is a generator function, and returns a generator.
+<p>
+  The <code>yield from</code> expression lets a generator delegate to an
+  arbitrary iterable.
+</p>
+
+<pre><code>yield from iterable</code></pre>
+
+<p>is like</p>
+
+<pre><code>for item in iterable:
+    yield item</code></pre>
+
+<p>
+  except it also passes through calls to <code>send()</code>,
+  <code>throw()</code> and <code>close()</code>.
+</p>

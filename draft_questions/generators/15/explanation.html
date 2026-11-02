@@ -1,3 +1,10 @@
-<code>close()</code> throws a <code>GeneratorExit</code> at the point the
-generator function was paused. If (as typical) the <code>GeneratorExit</code> is
-not caught, the generator is closed.
+<p>
+  The first <code>next()</code> runs the body, which raises. The
+  <code>ConnectionError</code> propagates out of <code>next()</code> to the
+  caller.
+</p>
+
+<p>
+  A generator which raises is finished. The second <code>next()</code> raises
+  <code>StopIteration</code>: <code>yield "ok"</code> is never reached.
+</p>

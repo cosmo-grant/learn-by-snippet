@@ -3,4 +3,4 @@ def foo(x):
     yield from range(x)
 
 
-print(type(foo(3)))
+print(list(foo(3)))

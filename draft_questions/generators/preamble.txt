@@ -1,0 +1,1 @@
+Yield, send, throw, close, and the like.

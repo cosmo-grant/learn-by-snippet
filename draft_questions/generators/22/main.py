@@ -1,12 +1,12 @@
-from contextlib import contextmanager
+def generator():
+    try:
+        yield 1
+        yield 2
+    finally:
+        yield 3
 
 
-@contextmanager
-def func():
-    print("foo")
-    yield "bar"
-    print("baz")
-
-
-with func() as blah:
-    print(blah)
+g = generator()
+print(next(g))
+g.close()
+print(next(g))

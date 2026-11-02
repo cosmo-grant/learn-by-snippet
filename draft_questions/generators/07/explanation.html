@@ -1,1 +1,9 @@
-A return in a generator raises a <code>StopIteration</code>.
+<p>
+  Each <code>next()</code> runs the body up to the next <code>yield</code>,
+  hands back the yielded value, and pauses, keeping local state like
+  <code>i</code>.
+</p>
+
+<p>
+  When the body finishes, <code>next()</code> raises <code>StopIteration</code>.
+</p>

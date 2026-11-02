@@ -1,2 +1,7 @@
-Use <code>throw()</code> to get a value from a generator by throwing an
-exception.
+<p>Catch the <code>StopIteration</code> and read <code>.value</code>.</p>
+
+<p>
+  A <code>for</code> loop discards the return value.
+  <code>yield from</code> doesn't: <code>result = yield from gen()</code> sets
+  <code>result</code> to the return value of <code>gen()</code>.
+</p>

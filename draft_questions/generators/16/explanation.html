@@ -1,1 +1,10 @@
-Calling <code>close()</code> on a closed generator does nothing.
+<p>
+  <code>throw()</code> raises the exception inside the generator, at the paused
+  <code>yield</code>.
+</p>
+
+<p>
+  Here the generator catches it and yields <code>2</code>, which
+  <code>throw()</code> returns. The next <code>next()</code> resumes after
+  <code>yield 2</code>, loops round, and yields <code>1</code>.
+</p>

@@ -1,9 +1,6 @@
 def generator():
-    try:
-        yield 1
-        yield 2
-    finally:
-        print("made it")
+    yield 1
+    yield 2
 
 
 g = generator()

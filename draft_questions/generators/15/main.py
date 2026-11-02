@@ -1,9 +1,14 @@
-def generator():
-    yield 1
-    yield 2
+def response_simulator():
+    raise ConnectionError
+    yield "ok"
 
 
-g = generator()
-print(next(g))
-g.close()
-print(next(g))
+responses = response_simulator()
+
+for _ in range(2):
+    try:
+        response = next(responses)
+    except ConnectionError:
+        print("connection error")
+    else:
+        print(response)

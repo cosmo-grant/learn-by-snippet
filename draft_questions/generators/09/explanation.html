@@ -1,9 +1,7 @@
-The <code>yield from </code>expression allows a generator to delegate to an
-arbitrary iterator.
+<p>
+  Any <code>yield</code> in the body, even an unreachable one, makes a generator
+  function. So <code>f(True)</code> returns a generator which ends immediately.
+  Unpacking it gives no items, and <code>print()</code> prints just a newline.
+</p>
 
-<pre><code class="lang-text">yield from iterable</code></pre>
-is like
-<pre><code class="lang-text">for item in iterable:
-    yield item</code></pre>
-except it accommodates calls to <code>send()</code>, <code>throw()</code> and
-<code>close()</code>.
+<p>The returned <code>1</code> isn't an item, so isn't printed.</p>

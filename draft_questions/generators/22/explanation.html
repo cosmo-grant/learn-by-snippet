@@ -1,5 +1,9 @@
-<code>@contextmanager</code> turns a generator function into a context manager
-factory. The <code>__enter__</code> creates <code>gen</code>, calls
-<code>next(gen)</code>, and returns what's yielded. The
-<code>__exit__</code> calls <code>gen.throw(excptn)</code> else
-<code>next(gen)</code>.
+<p>
+  A generator being closed mustn't yield. If it does,
+  <code>close()</code> raises <code>RuntimeError</code>.
+</p>
+
+<p>
+  The traceback comes from <code>close()</code>: the last <code>next()</code> is
+  never reached.
+</p>

@@ -1,1 +1,17 @@
-When an exception bubbles up from a generator, the generator is closed.
+<p>
+  <code>@contextmanager</code> turns a generator function into a context manager
+  factory.
+</p>
+
+<p>
+  <code>__enter__()</code> calls <code>next()</code> on the generator, and binds
+  the yielded value to the <code>as</code> target.
+  <code>__exit__()</code> resumes the generator: with <code>next()</code> if the
+  block succeeded, or <code>throw()</code> if it raised.
+</p>
+
+<p>
+  So code before the <code>yield</code> is setup and code after is teardown.
+  Wrap the <code>yield</code> in <code>try</code>/<code>finally</code> to make
+  sure teardown runs.
+</p>

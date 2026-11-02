@@ -1,2 +1,8 @@
-<code>GeneratorExit</code> directly inherits from <code>BaseException</code>,
-not <code>Exception</code>, since it's not an error.
+<p>
+  The exception propagates out of the generator, so out of <code>throw()</code>,
+  to the caller.
+</p>
+
+<p>
+  And as with any exception escaping a generator, the generator is now finished.
+</p>

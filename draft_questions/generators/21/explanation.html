@@ -1,2 +1,5 @@
-A return in a generator raises a <code>StopIteration</code>. The return value is
-smuggled out via <code>StopIteration.value</code>.
+<p>
+  The <code>GeneratorExit</code> unwinds the generator like any exception, so
+  <code>finally</code> blocks run. They're the place for cleanup, e.g. closing a
+  file.
+</p>

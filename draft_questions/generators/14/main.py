@@ -1,12 +1,10 @@
-def generator():
+def func():
+    output = 0
     while True:
-        try:
-            yield 1
-        except TypeError as exception:
-            yield 2
+        new = yield output
+        output = new if new is not None else output
 
 
-g = generator()
-print(next(g))
-print(g.throw(ValueError))
-print(next(g))
+genr = func()
+print(genr.send(5))
+print(next(genr))

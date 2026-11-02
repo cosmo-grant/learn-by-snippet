@@ -1,13 +1,12 @@
-def gen():
-    yield 1
-    yield 2
-    return 3
+def generator():
+    try:
+        yield 1
+        yield 2
+    finally:
+        print("made it")
 
 
-g = gen()
-print(g.send(None))
-print(g.send(None))
-try:
-    g.send(None)
-except StopIteration as exc:
-    print(exc.value)
+g = generator()
+print(next(g))
+g.close()
+print(next(g))
