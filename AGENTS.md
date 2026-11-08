@@ -48,7 +48,12 @@ Snippet correctness (does the code actually produce `output.txt`?) is checked wi
 external [snippet-checker](https://pypi.org/project/snippet-checker/) tool, configured via
 `questions/snippet_checker.toml` (per-quiz/per-question `snippet_checker.toml` overrides exist,
 e.g. to disable output checking for timing-sensitive snippets). This isn't wired into `make`;
-run it separately if verifying snippet output.
+run it separately if verifying snippet output:
+
+```txt
+snippet-checker output questions/<dir>
+snippet-checker format questions/<dir>
+```
 
 ## Conventions worth preserving
 
