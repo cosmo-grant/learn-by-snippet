@@ -2,8 +2,8 @@
 
 ## What this is
 
-A static-site quiz generator: read a Python/C/Go snippet, predict the output.
-Covers multiple topics (quizzes), not just concurrency — see `questions/`
+A static-site quiz generator: read a snippet, predict the output.
+Covers multiple topics (quizzes) — see `questions/`
 (`concurrency`, `slices`, `sockets`, `unix_system_calls`). `draft_questions/`
 holds work-in-progress questions not yet wired into a quiz.
 
