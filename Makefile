@@ -1,7 +1,7 @@
 .PHONY: format questions view preview
 
 format:
-	uv tool run ruff format .
+	ruff format .
 	prettier --write .
 
 questions:
