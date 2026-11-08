@@ -5,7 +5,7 @@
 int main(int argc, char *argv[]) {
   if (fork() > 0) {
     if (fork() > 0) {
-      wait(0);
+      wait(NULL);
       printf("here\n");
     } else {
       sleep(1);

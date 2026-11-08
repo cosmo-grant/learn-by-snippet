@@ -6,7 +6,7 @@ int main(int argc, char *argv[]) {
   if (fork() == 0) {
     close(1);
   } else {
-    wait(0);
+    wait(NULL);
     write(1, "x\n", 2);
   }
 }

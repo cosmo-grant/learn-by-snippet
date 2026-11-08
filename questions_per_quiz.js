@@ -253,7 +253,7 @@ const QUESTIONS_PER_QUIZ = {
       },
       {
         "code": "import socket\nfrom threading import Thread\n\n\ndef client():\n    sock = socket.create_connection((\"127.0.0.1\", 44444))\n    sock.send(b\"x\")\n\n\nsrv1 = socket.socket()\nsrv1.bind((\"127.0.0.1\", 44444))\nsrv1.listen()\nThread(target=client).start()\nconn, _ = srv1.accept()\nprint(conn.recv(1))\nconn.close()\nsrv1.close()\n\nsrv2 = socket.socket()\nsrv2.bind((\"127.0.0.1\", 44444))\nsrv2.listen()\nThread(target=client).start()\nprint(conn.recv(1))\nconn.close()\nsrv1.close()\n",
-        "output": "b'x'\nOSError: [Errno NN] Address already in use\n",
+        "output": "b'x'\nTraceback (most recent call last):\n  ...\nOSError: [Errno NN] Address already in use\n",
         "explanation": "<p>\n  The kernel puts the active closer in <code>TIME_WAIT</code> for a while, else\n  delayed packets might bleed into fresh connections.\n</p>\n\n<p>\n  Set the <code>SO_REUSEADDR</code> option to allow binds to\n  <code>TIME_WAIT</code>s.\n</p>\n",
         "preface": "",
         "highlightjsAlias": "py"
@@ -280,49 +280,49 @@ const QUESTIONS_PER_QUIZ = {
     "preamble": "Fork, exec, and friends.",
     "questions": [
       {
-        "code": "#include <stdio.h>\n#include <unistd.h>\n\nint main(int argc, char *argv[]) {\n  printf(\"hi\\n\");\n  fork();\n  printf(\"bye\\n\");\n}\n",
-        "output": "hi\nbye\nbye",
-        "explanation": "<p><code>fork()</code> duplicates the calling process.</p>\n\n<p>The child starts as if returning from <code>fork()</code>.</p>\n",
-        "preface": "<p>What does this ouput?</p>\n",
+        "code": "#include <stdio.h>\n#include <sys/wait.h>\n#include <unistd.h>\n\nint main(int argc, char *argv[]) {\n  printf(\"hi\\n\");\n  fork();\n  printf(\"bye\\n\");\n  wait(NULL);\n}\n",
+        "output": "hi\nbye\nbye\n",
+        "explanation": "<p><code>fork()</code> duplicates the calling process.</p>\n\n<p>It returns <em>twice</em>, in the parent (the calling process) and in the child (the new process).</p>\n\n<p><code>wait()</code> blocks until a child exits, here giving the child a chance to print.\n(We'll cover <code>wait()</code> more later.)</p>\n",
+        "preface": "<p>What does this output?</p>\n",
         "highlightjsAlias": "c"
       },
       {
-        "code": "#include <stdio.h>\n#include <unistd.h>\n\nint main(int argc, char *argv[]) {\n  fork();\n  fork();\n  printf(\"hello\\n\");\n}\n",
+        "code": "#include <stdio.h>\n#include <sys/wait.h>\n#include <unistd.h>\n\nint main(int argc, char *argv[]) {\n  fork();\n  fork();\n  printf(\"hello\\n\");\n  wait(NULL);\n  wait(NULL);\n}\n",
         "output": "hello\nhello\nhello\nhello\n",
-        "explanation": "<p>Multiple <code>fork()</code>s generate a tree.</p>\n",
+        "explanation": "<p>Multiple <code>fork()</code>s generate a family tree:</p>\n\n<pre><code>a\n|-- b\n|   `-- c\n`-- d</code></pre>\n\n<p>(Again, the <code>wait()</code>s give all descendants a chance to print.)</p>\n",
         "preface": "<p>What if we <code>fork()</code> twice?</p>\n",
         "highlightjsAlias": "c"
       },
       {
-        "code": "#include <stdio.h>\n#include <unistd.h>\n\nint main(int argc, char *argv[]) {\n  printf(\"hi\");\n  fork();\n  printf(\"bye\");\n}\n",
+        "code": "#include <stdio.h>\n#include <sys/wait.h>\n#include <unistd.h>\n\nint main(int argc, char *argv[]) {\n  printf(\"hi\");\n  fork();\n  printf(\"bye\");\n  wait(NULL);\n}\n",
         "output": "hibyehibye",
         "explanation": "<p>No newline, so <code>\"hi\"</code> is buffered.</p>\n\n<p><code>fork()</code> duplicates the parent, including the buffer.</p>\n",
         "preface": "<p>Spot the difference?</p>\n",
         "highlightjsAlias": "c"
       },
       {
-        "code": "#include <stdio.h>\n#include <sys/wait.h>\n#include <unistd.h>\n\nint main(int argc, char *argv[]) {\n  if (fork() == 0) {\n    printf(\"foo\\n\");\n  } else {\n    wait(NULL);\n    printf(\"bar\\n\");\n  }\n}\n",
-        "output": "foo\nbar\n",
-        "explanation": "<p><code>wait()</code> blocks until a child exits.</p>\n\n<p>(We'll come back to the <code>NULL</code>.)</p>\n",
-        "preface": "<p>Time to <code>wait</code>.</p>\n",
+        "code": "#include <stdio.h>\n#include <sys/wait.h>\n#include <unistd.h>\n\nint main(int argc, char *argv[]) {\n  int ret = fork();\n  wait(NULL);\n  printf(\"%d\\n\", ret == 0);\n}\n",
+        "output": "1\n0\n",
+        "explanation": "<p><code>fork()</code> returns 0 in the child, and the child's pid in the parent.</p>\n\n<p>(The child's pid varies from run to run of course.)</p>\n",
+        "preface": "<p><code>fork()</code> forks, and returns what?</p>\n",
         "highlightjsAlias": "c"
       },
       {
-        "code": "#include <stdio.h>\n#include <sys/wait.h>\n#include <unistd.h>\n\nint main(int argc, char *argv[]) {\n  int x;\n  x = wait(NULL);\n  printf(\"%d\\n\", x);\n}\n",
+        "code": "#include <stdio.h>\n#include <sys/wait.h>\n#include <unistd.h>\n\nint main(int argc, char *argv[]) {\n  if (fork() == 0) {\n    sleep(1);\n  } else {\n    wait(NULL);\n    printf(\"here\\n\");\n  }\n}\n",
+        "output": "<~1s>\nhere\n",
+        "explanation": "<p>To repeat: <code>wait()</code> blocks until a child exits.</p>\n",
+        "preface": "<p>Now we can cover <code>wait()</code> properly. Output?</p>\n",
+        "highlightjsAlias": "c"
+      },
+      {
+        "code": "#include <stdio.h>\n#include <sys/wait.h>\n#include <unistd.h>\n\nint main(int argc, char *argv[]) {\n  int x = wait(NULL);\n  printf(\"%d\\n\", x);\n}\n",
         "output": "-1\n",
-        "explanation": "<p><code>wait()</code> returns -1 immediately.</p>\n",
+        "explanation": "<p>Then <code>wait()</code> returns -1 immediately.</p>\n",
         "preface": "<p>What if no children to wait for?</p>\n",
         "highlightjsAlias": "c"
       },
       {
-        "code": "#include <stdio.h>\n#include <sys/wait.h>\n#include <unistd.h>\n\nint main(int argc, char *argv[]) {\n  if (fork() == 0) {\n    sleep(1);\n  } else {\n    wait(0);\n    printf(\"here\\n\");\n  }\n}\n",
-        "output": "<~1s>\nhere\n",
-        "explanation": "<p>Yes.</p>\n",
-        "preface": "<p>Is <code>wait()</code> well-named?</p>\n",
-        "highlightjsAlias": "c"
-      },
-      {
-        "code": "#include <stdio.h>\n#include <sys/wait.h>\n#include <unistd.h>\n\nint main(int argc, char *argv[]) {\n  if (fork() > 0) {\n    if (fork() > 0) {\n      wait(0);\n      printf(\"here\\n\");\n    } else {\n      sleep(1);\n    }\n  } else {\n    sleep(2);\n  }\n}\n",
+        "code": "#include <stdio.h>\n#include <sys/wait.h>\n#include <unistd.h>\n\nint main(int argc, char *argv[]) {\n  if (fork() > 0) {\n    if (fork() > 0) {\n      wait(NULL);\n      printf(\"here\\n\");\n    } else {\n      sleep(1);\n    }\n  } else {\n    sleep(2);\n  }\n}\n",
         "output": "<~1s>\nhere\n",
         "explanation": "<p><code>wait()</code> blocks until <em>a</em> child exits.</p>\n",
         "preface": "<p>What happens if multiple children?</p>\n",
@@ -364,14 +364,14 @@ const QUESTIONS_PER_QUIZ = {
         "highlightjsAlias": "c"
       },
       {
-        "code": "#include <fcntl.h>\n#include <sys/wait.h>\n#include <unistd.h>\n\nint main(int argc, char *argv[]) {\n  int fd = dup(1);\n  if (fork() == 0) {\n    write(fd, \"x\\n\", 2);\n  } else {\n    wait(0);\n  }\n}\n",
+        "code": "#include <fcntl.h>\n#include <sys/wait.h>\n#include <unistd.h>\n\nint main(int argc, char *argv[]) {\n  int fd = dup(1);\n  if (fork() == 0) {\n    write(fd, \"x\\n\", 2);\n  } else {\n    wait(NULL);\n  }\n}\n",
         "output": "x\n",
         "explanation": "<p><code>fork()</code> copies the parent's file descriptor table.</p>\n",
         "preface": "<p>\n  What happens to a <code>dup()</code>'d descriptor across <code>fork()</code>?\n</p>\n",
         "highlightjsAlias": "c"
       },
       {
-        "code": "#include <fcntl.h>\n#include <sys/wait.h>\n#include <unistd.h>\n\nint main(int argc, char *argv[]) {\n  if (fork() == 0) {\n    close(1);\n  } else {\n    wait(0);\n    write(1, \"x\\n\", 2);\n  }\n}\n",
+        "code": "#include <fcntl.h>\n#include <sys/wait.h>\n#include <unistd.h>\n\nint main(int argc, char *argv[]) {\n  if (fork() == 0) {\n    close(1);\n  } else {\n    wait(NULL);\n    write(1, \"x\\n\", 2);\n  }\n}\n",
         "output": "x\n",
         "explanation": "<p>To repeat: <code>fork()</code> copies the parent's file descriptor table.</p>\n\n<p>The parent doesn't see the child's changes.</p>\n",
         "preface": "<p>So what about this?</p>\n",
@@ -392,8 +392,8 @@ const QUESTIONS_PER_QUIZ = {
         "highlightjsAlias": "c"
       },
       {
-        "code": "#include <stdio.h>\n#include <string.h>\n#include <unistd.h>\n\nint main(int argc, char *argv[]) {\n  int rc = fork();\n  if (rc == 0) {\n    char *myargs[3];\n    myargs[0] = strdup(\"echo\");\n    myargs[1] = strdup(\"this\");\n    myargs[2] = NULL;\n    execvp(myargs[0], myargs);\n    printf(\"here\\n\");\n  }\n}\n",
-        "output": "this",
+        "code": "#include <stdio.h>\n#include <string.h>\n#include <sys/wait.h>\n#include <unistd.h>\n\nint main(int argc, char *argv[]) {\n  int rc = fork();\n  if (rc == 0) {\n    char *myargs[3];\n    myargs[0] = strdup(\"echo\");\n    myargs[1] = strdup(\"this\");\n    myargs[2] = NULL;\n    execvp(myargs[0], myargs);\n    printf(\"here\\n\");\n  }\n  wait(NULL);\n}\n",
+        "output": "this\n",
         "explanation": "<p>\n  <code>exec()</code> overwrites the calling process's code and data with the\n  given executable's.\n</p>\n\n<p>A successful call to <code>exec()</code> never returns.</p>\n",
         "preface": "<p>Now <code>exec()</code>. What does it do?</p>\n",
         "highlightjsAlias": "c"

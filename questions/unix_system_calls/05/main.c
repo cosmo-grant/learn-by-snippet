@@ -3,7 +3,10 @@
 #include <unistd.h>
 
 int main(int argc, char *argv[]) {
-  int x;
-  x = wait(NULL);
-  printf("%d\n", x);
+  if (fork() == 0) {
+    sleep(1);
+  } else {
+    wait(NULL);
+    printf("here\n");
+  }
 }

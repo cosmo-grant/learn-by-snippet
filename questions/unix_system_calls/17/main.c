@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <string.h>
+#include <sys/wait.h>
 #include <unistd.h>
 
 int main(int argc, char *argv[]) {
@@ -12,4 +13,5 @@ int main(int argc, char *argv[]) {
     execvp(myargs[0], myargs);
     printf("here\n");
   }
+  wait(NULL);
 }

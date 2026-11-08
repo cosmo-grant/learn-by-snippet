@@ -1,3 +1,11 @@
 <p><code>fork()</code> duplicates the calling process.</p>
 
-<p>The child starts as if returning from <code>fork()</code>.</p>
+<p>
+  It returns <em>twice</em>, in the parent (the calling process) and in the
+  child (the new process).
+</p>
+
+<p>
+  <code>wait()</code> blocks until a child exits, here giving the child a chance
+  to print. (We'll cover <code>wait()</code> more later.)
+</p>
