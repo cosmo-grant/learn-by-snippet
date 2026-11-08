@@ -1,3 +1,4 @@
+#include <stdio.h>
 #include <unistd.h>
 
 int main(int argc, char *argv[]) {
@@ -9,6 +10,6 @@ int main(int argc, char *argv[]) {
     write(p[1], "x", 1);
   } else {
     read(p[0], &c, 1);
-    write(1, &c, 1);
+    printf("%c\n", c);
   }
 }

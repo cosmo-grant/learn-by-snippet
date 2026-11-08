@@ -3,9 +3,7 @@
 #include <unistd.h>
 
 int main(int argc, char *argv[]) {
-  int x;
-  char buf[] = "x\n";
-  x = dup(1);
+  int x = dup(1);
   printf("%d\n", x);
-  write(x, &buf, 2);
+  write(x, "this", 4);
 }
