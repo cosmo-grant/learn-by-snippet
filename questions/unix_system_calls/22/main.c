@@ -2,13 +2,13 @@
 
 int main(int argc, char *argv[]) {
   int p[2];
-  char buf[1];
+  char c;
   pipe(p);
   if (fork() == 0) {
     sleep(1);
     write(p[1], "x", 1);
   } else {
-    read(p[0], buf, 1);
-    write(1, buf, 1);
+    read(p[0], &c, 1);
+    write(1, &c, 1);
   }
 }
