@@ -357,9 +357,9 @@ const QUESTIONS_PER_QUIZ = {
         "highlightjsAlias": "c"
       },
       {
-        "code": "#include <stdio.h>\n#include <sys/wait.h>\n#include <unistd.h>\n\nint main(int argc, char *argv[]) {\n  int x;\n  char buf[] = \"x\\n\";\n  x = dup(1);\n  printf(\"%d\\n\", x);\n  write(x, &buf, 2);\n}\n",
-        "output": "3\nx\n",
-        "explanation": "<p>\n  <code>dup(fd)</code> returns a new file descriptor referring to the same file\n  as <code>fd</code>.\n</p>\n",
+        "code": "#include <stdio.h>\n#include <sys/wait.h>\n#include <unistd.h>\n\nint main(int argc, char *argv[]) {\n  int x = dup(1);\n  printf(\"%d\\n\", x);\n  write(x, \"this\", 4);\n}\n",
+        "output": "3\nthis",
+        "explanation": "<p>\n  <code>dup(fd)</code> returns a <em>new</em> file descriptor referring to the <em>same</em> file.\n</p>\n",
         "preface": "<p>What does <code>dup()</code> do?</p>\n",
         "highlightjsAlias": "c"
       },
@@ -378,8 +378,8 @@ const QUESTIONS_PER_QUIZ = {
         "highlightjsAlias": "c"
       },
       {
-        "code": "#include <fcntl.h>\n#include <unistd.h>\n\nint main(int argc, char *argv[]) {\n  int fd1 = open(\"testfile\", O_CREAT | O_RDWR, 0644);\n  int fd2 = open(\"testfile\", O_RDWR);\n  write(fd1, \"ab\", 1);\n  char buf[1];\n  read(fd2, buf, 1);\n  write(1, buf, 1);\n}\n",
-        "output": "a",
+        "code": "#include <fcntl.h>\n#include <stdio.h>\n#include <unistd.h>\n\nint main(int argc, char *argv[]) {\n  int fd1 = open(\"a_file\", O_CREAT | O_RDWR, 0644);\n  int fd2 = open(\"a_file\", O_RDWR);\n  write(fd1, \"ab\", 1);\n  char c;\n  read(fd2, &c, 1);\n  printf(\"%c\\n\", c);\n}\n",
+        "output": "a\n",
         "explanation": "<p><code>open()</code>s get independent offsets.</p>\n",
         "preface": "<p>What if we <code>open()</code> the same file twice?</p>\n",
         "highlightjsAlias": "c"
@@ -420,28 +420,28 @@ const QUESTIONS_PER_QUIZ = {
         "highlightjsAlias": "c"
       },
       {
-        "code": "#include <unistd.h>\n\nint main(int argc, char *argv[]) {\n  int p[2];\n  char buf[1];\n  pipe(p);\n  read(p[0], buf, 1);\n}\n",
+        "code": "#include <unistd.h>\n\nint main(int argc, char *argv[]) {\n  int p[2];\n  char c;\n  pipe(p);\n  read(p[0], &c, 1);\n}\n",
         "output": "...\n",
         "explanation": "<p>\n  Reads on a <code>pipe()</code> block until data is available or all write-side\n  file descriptors are closed.\n</p>\n\n<p>Neither happens here, so it hangs.</p>\n",
         "preface": "<p>A <code>read()</code> with no <code>write()</code>s. What happens?</p>\n",
         "highlightjsAlias": "c"
       },
       {
-        "code": "#include <unistd.h>\n\nint main(int argc, char *argv[]) {\n  int p[2];\n  char buf[1];\n  pipe(p);\n  if (fork() == 0) {\n    sleep(1);\n    write(p[1], \"x\", 1);\n  } else {\n    read(p[0], buf, 1);\n    write(1, buf, 1);\n  }\n}\n",
-        "output": "<~1s>\nx",
+        "code": "#include <stdio.h>\n#include <unistd.h>\n\nint main(int argc, char *argv[]) {\n  int p[2];\n  char c;\n  pipe(p);\n  if (fork() == 0) {\n    sleep(1);\n    write(p[1], \"x\", 1);\n  } else {\n    read(p[0], &c, 1);\n    printf(\"%c\\n\", c);\n  }\n}\n",
+        "output": "<~1s>\nx\n",
         "explanation": "<p>\n  Reads on a <code>pipe()</code> block until data is available or all write-side\n  file descriptors are closed.\n</p>\n\n<p>Data is available here.</p>\n",
         "preface": "<p>What if some data does get written?</p>\n",
         "highlightjsAlias": "c"
       },
       {
-        "code": "#include <unistd.h>\n\nint main(int argc, char *argv[]) {\n  int p[2];\n  char buf[1];\n  pipe(p);\n  if (fork() == 0) {\n    sleep(1);\n    close(p[1]);\n  } else {\n    read(p[0], buf, 1);\n  }\n}\n",
+        "code": "#include <unistd.h>\n\nint main(int argc, char *argv[]) {\n  int p[2];\n  char c;\n  pipe(p);\n  if (fork() == 0) {\n    sleep(1);\n    close(p[1]);\n  } else {\n    read(p[0], &c, 1);\n  }\n}\n",
         "output": "...\n",
         "explanation": "<p>\n  Reads on a <code>pipe()</code> block until data is available or all write-side\n  file descriptors are closed.\n</p>\n\n<p><code>fork()</code> copies the file descriptor table.</p>\n\n<p>The child closes its fd pointing at the pipe's write-end.</p>\n\n<p>But the parent doesn't, so it still hangs.</p>\n",
         "preface": "<p>What if the child closes its write end, but the parent doesn't?</p>\n",
         "highlightjsAlias": "c"
       },
       {
-        "code": "#include <unistd.h>\n\nint main(int argc, char *argv[]) {\n  int p[2];\n  char buf[1];\n  pipe(p);\n  if (fork() == 0) {\n    sleep(1);\n    close(p[1]);\n  } else {\n    close(p[1]);\n    read(p[0], buf, 1);\n  }\n}\n",
+        "code": "#include <unistd.h>\n\nint main(int argc, char *argv[]) {\n  int p[2];\n  char c;\n  pipe(p);\n  if (fork() == 0) {\n    sleep(1);\n    close(p[1]);\n  } else {\n    close(p[1]);\n    read(p[0], &c, 1);\n  }\n}\n",
         "output": "",
         "explanation": "<p>All good this time.</p>\n",
         "preface": "<p>And if both close it?</p>\n",
