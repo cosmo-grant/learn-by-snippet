@@ -1,2 +1,4 @@
 b'x'
+Traceback (most recent call last):
+  ...
 OSError: [Errno NN] Address already in use
